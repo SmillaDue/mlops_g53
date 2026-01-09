@@ -69,5 +69,6 @@ Data
 The project uses the Brain Tumor MRI Dataset, consisting of 7,023 2D brain MRI images categorized into four classes: glioma, meningioma, pituitary tumor, and no tumor.
 The dataset will be split into training, validation, and test sets. 
 
-Models
+Model
+
 As a baseline model, we use DenseNet121, initialized with ImageNet pre-trained weights and adapted for four-class classification. DenseNet121 is a well-established architecture in medical imaging tasks and provides a strong balance between performance and computational efficiency. For evaluation basic things like accuracy and F1 scores will be calculated.
