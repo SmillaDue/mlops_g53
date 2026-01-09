@@ -61,6 +61,7 @@ Goal
 This is the project description for group 53 in the 02476 Machine Learning Operations course on DTU. The goal is to design, implement, and evaluate a reproducible medical image classification pipeline, demonstrating practical understanding of machine learning workflows, model training, evaluation, and operational considerations such as experiment tracking and explainability.
 
 Framework
+
 We use the MONAI framework, a PyTorch-based open-source library specialized for healthcare imaging. MONAI provides standardized components for data loading, preprocessing, model architectures, and visualization, making it suitable for building reliable and reproducible medical imaging pipelines.
 
 Data
