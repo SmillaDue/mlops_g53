@@ -19,9 +19,15 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi==0.115.6",
+    "matplotlib>=3.10.8",
+    "monai>=1.5.1",
+    "numpy>=2.4.0",
+    "scikit-learn>=1.8.0",
     "torch==2.6.0",
+    "torchvision>=0.21.0",
     "typer==0.15.1",
     "uvicorn==0.34.0",
+    "wandb>=0.23.1",
 ]
 
 [dependency-groups]
