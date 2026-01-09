@@ -1,6 +1,5 @@
 # mlops_project
 
-Project Description
 
 Goal
 
@@ -12,7 +11,7 @@ We use the MONAI framework, a PyTorch-based open-source library specialized for 
 
 Data
 
-The project uses the Brain Tumor MRI Dataset, consisting of 7,023 2D brain MRI images categorized into four classes: glioma, meningioma, pituitary tumor, and no tumor.
+The project uses the Brain Tumor MRI Dataset(https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset) from Kaggle, consisting of 7,023 2D brain MRI images categorized into four classes: glioma, meningioma, pituitary tumor, and no tumor.
 The dataset will be split into training, validation, and test sets. 
 
 Model
