@@ -1,16 +1,70 @@
 from torch import nn
 import torch
+from monai.networks.nets import DenseNet121
 
-class Model(nn.Module):
-    """Just a dummy model to show how to structure your code"""
-    def __init__(self):
+class SmallCNN(nn.Module):
+    def __init__(self, num_classes=4):
         super().__init__()
-        self.layer = nn.Linear(1, 1)
+        self.net = nn.Sequential(
+            nn.Conv2d(1, 16, 3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+
+            nn.Conv2d(16, 32, 3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+
+            nn.AdaptiveAvgPool2d(1),
+            nn.Flatten(),
+            nn.Linear(32, num_classes),
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.layer(x)
+        return self.net(x)
+
+
+class DeepCNN(nn.Module):
+    def __init__(self, num_classes=4):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Conv2d(1, 32, 3, padding=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+
+            nn.Conv2d(32, 64, 3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+
+            nn.Conv2d(64, 128, 3, padding=1),
+            nn.BatchNorm2d(128),
+            nn.ReLU(),
+
+            nn.AdaptiveAvgPool2d(1),
+            nn.Flatten(),
+            nn.Linear(128, num_classes),
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.net(x)
+
+
+class DenseNetModel(nn.Module):
+    def __init__(self, num_classes=4):
+        super().__init__()
+        self.net = DenseNet121(
+            spatial_dims=2,
+            in_channels=1,
+            out_channels=num_classes,
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.net(x)
+
 
 if __name__ == "__main__":
-    model = Model()
-    x = torch.rand(1)
-    print(f"Output shape of model: {model(x).shape}")
+    model = DenseNetModel(num_classes=4)
+    x = torch.randn(2, 1, 128, 128)
+    y = model(x)
+    print(y.shape)  
