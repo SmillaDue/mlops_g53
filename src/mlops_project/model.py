@@ -61,6 +61,12 @@ class DenseNetModel(nn.Module):
 
 if __name__ == "__main__":
     model = DenseNetModel(num_classes=4)
+    model = SmallCNN(num_classes=4)
+    model = DeepCNN(num_classes=4)
+
+    print(f"Model architecture: {model}")
+    print(f"Number of parameters: {sum(p.numel() for p in model.parameters())}")
+    print(type(model))
     x = torch.randn(2, 1, 128, 128)
     y = model(x)
-    print(y.shape)
+    print(f"Output shape: {y.shape}")
