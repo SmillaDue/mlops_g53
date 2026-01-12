@@ -1,0 +1,10 @@
+# Training hyperparameters
+batch_size: 32
+epochs: 10
+seed: 42
+
+# Optimizer configuration
+optimizer:
+    name: Adam  # Options: Adam, SGD, AdamW, RMSprop, etc.
+    lr: 0.001
+    weight_decay: 0

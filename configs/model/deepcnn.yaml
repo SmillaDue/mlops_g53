@@ -1,0 +1,6 @@
+_target_: mlops_project.model.DeepCNN
+# Add any hyperparameters for DeepCNN here
+# For example:
+# in_channels: 3
+# num_classes: 10
+# dropout_rate: 0.5

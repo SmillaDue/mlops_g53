@@ -1,0 +1,5 @@
+_target_: mlops_project.model.DenseNetModel
+# Add any hyperparameters for DenseNetModel here
+# For example:
+# num_classes: 10
+# growth_rate: 32
