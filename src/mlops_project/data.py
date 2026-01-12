@@ -1,21 +1,20 @@
-import os 
-from PIL import Image
+import os
 import shutil
 import tempfile
+
 import matplotlib.pyplot as plt
-import torch
 import numpy as np
-from torch.utils.data import DataLoader
+import torch
 from monai.apps import download_and_extract
 from monai.config import print_config
-from monai.data import decollate_batch, DataLoader
+from monai.data import DataLoader, decollate_batch
 from monai.metrics import ROCAUCMetric
 from monai.networks.nets import DenseNet121
 from monai.transforms import (
     Activations,
-    EnsureChannelFirst,
     AsDiscrete,
     Compose,
+    EnsureChannelFirst,
     LoadImage,
     RandFlip,
     RandRotate,
@@ -23,6 +22,9 @@ from monai.transforms import (
     ScaleIntensity,
 )
 from monai.utils import set_determinism
+from PIL import Image
+from torch.utils.data import DataLoader
+
 print_config()
 #### Load training data ######
 

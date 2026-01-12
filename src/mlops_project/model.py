@@ -1,6 +1,7 @@
-from torch import nn
 import torch
 from monai.networks.nets import DenseNet121
+from torch import nn
+
 
 class SmallCNN(nn.Module):
     def __init__(self, num_classes=4):
