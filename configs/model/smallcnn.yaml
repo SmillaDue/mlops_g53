@@ -1,0 +1,5 @@
+_target_: mlops_project.model.SmallCNN
+# Add any hyperparameters for SmallCNN here
+# For example:
+# in_channels: 3
+# num_classes: 10
