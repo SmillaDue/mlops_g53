@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 from pathlib import Path
 from PIL import Image
 from collections import defaultdict
@@ -29,9 +28,3 @@ def test_data_loading(img_size: int = 256):
                 and sample_label.dtype == torch.long
                 and 0 <= sample_label.item() < 4
                     ), f"Expected label to be a 1-element tensor, dtype int and value < 4, got {sample_label} ({type(sample_label)}), at index {i}"
-
-=======
-def test_placeholder():
-    """Placeholder test until data is ready."""
-    assert True
->>>>>>> main
