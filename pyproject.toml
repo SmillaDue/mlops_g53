@@ -19,9 +19,11 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi==0.115.6",
+    "imutils>=0.5.4",
     "matplotlib>=3.10.8",
     "monai>=1.5.1",
     "numpy>=2.4.0",
+    "opencv-python>=4.11.0.86",
     "scikit-learn>=1.8.0",
     "torch==2.6.0",
     "torchvision>=0.21.0",
