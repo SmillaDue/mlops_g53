@@ -43,7 +43,7 @@ filelock==3.20.3
     #   virtualenv
 fonttools==4.61.1
     # via matplotlib
-fsspec==2025.12.0
+fsspec==2026.1.0
     # via torch
 ghp-import==2.1.0
     # via mkdocs
