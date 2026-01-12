@@ -6,7 +6,10 @@ import random
 import matplotlib.pyplot as plt
 from mlops_project.data import brain_tumor
 import numpy as np
+import pytest
+import os
 
+@pytest.mark.skipif(not os.path.exists("data/processed/train_images.pt"), reason="Data file not found")
 def test_data_loading(img_size: int = 256):
     train_dataset, test_dataset = brain_tumor()
     assert len(train_dataset) == 5267, f"Expected 5267 training samples, got {len(train_dataset)}"
