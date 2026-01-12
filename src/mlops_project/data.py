@@ -75,10 +75,13 @@ num_test_class = len(test_class_names)
 
 # Collect image file paths organized by class
 test_image_files = [
-    [os.path.join(test_data_dir, test_class_names[i], x) for x in os.listdir(os.path.join(test_data_dir, test_class_names[i]))]
+    [
+        os.path.join(test_data_dir, test_class_names[i], x)
+        for x in os.listdir(os.path.join(test_data_dir, test_class_names[i]))
+    ]
     for i in range(num_test_class)
 ]
-num_test_each = [len(test_image_files[i]) for i in range(num_test_class)]   
+num_test_each = [len(test_image_files[i]) for i in range(num_test_class)]
 test_image_files_list = []
 test_image_class = []
 for i in range(num_test_class):
@@ -100,7 +103,7 @@ test_x = [test_image_files_list[i] for i in range(num_test_total)]
 test_y = [test_image_class[i] for i in range(num_test_total)]
 
 
-### PREPROCESSING 
+### PREPROCESSING
 
 
 ## Define transformations for training and validation
@@ -120,6 +123,7 @@ y_trans = Compose([AsDiscrete(to_onehot=num_class)])
 
 ### FINAL DATA LOADERS AND PREP OF DATASETS ###
 
+
 class BrainTumorDataset(torch.utils.data.Dataset):
     def __init__(self, image_files, labels, transforms):
         self.image_files = image_files
@@ -136,8 +140,8 @@ class BrainTumorDataset(torch.utils.data.Dataset):
 train_ds = BrainTumorDataset(train_x, train_y, train_transforms)
 train_loader = DataLoader(train_ds, batch_size=300, shuffle=True, num_workers=10)
 
-#val_ds = BrainTumorDataset(val_x, val_y, val_transforms)
-#val_loader = DataLoader(val_ds, batch_size=300, num_workers=10)
+# val_ds = BrainTumorDataset(val_x, val_y, val_transforms)
+# val_loader = DataLoader(val_ds, batch_size=300, num_workers=10)
 
 test_ds = BrainTumorDataset(test_x, test_y, train_transforms)
 test_loader = DataLoader(test_ds, batch_size=300, num_workers=10)
@@ -150,6 +154,3 @@ print(type(train_loader))
 print("TEST")
 print(f"Data item type: {type(test_ds[0])}")
 print(f"Image shape: {test_ds[0][0].shape}, Label: {test_ds[0][1]}")
-
-
-
