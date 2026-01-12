@@ -1,12 +1,14 @@
-from mlops_project.data import MyDataset
-from omegaconf import DictConfig
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from pathlib import Path
 
 import hydra
 import torch
+from omegaconf import DictConfig
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+
+from mlops_project.data import MyDataset
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+
 
 @hydra.main(config_path="../../configs", config_name="default_config.yaml", version_base=None)
 def train(config: DictConfig) -> None:
@@ -22,14 +24,14 @@ def train(config: DictConfig) -> None:
     # Set random seed for reproducibility
     torch.manual_seed(config.seed)
 
-    train_set, _ = MyDataset("data/raw") # NEEDS TO BE CHANGED WHEN DATA IS READY
+    train_set, _ = MyDataset("data/raw")  # NEEDS TO BE CHANGED WHEN DATA IS READY
     model = hydra.utils.instantiate(config.model).to(DEVICE)
 
     # Create a DataLoader to batch and shuffle the training data
     train_dataloader = torch.utils.data.DataLoader(train_set, batch_size=batch_size)
-    
+
     loss_fn = torch.nn.CrossEntropyLoss()
-    
+
     # Initialize optimizer from config
     optimizer_class = getattr(torch.optim, config.optimizer.name, torch.optim.Adam)
     optimizer = optimizer_class(model.parameters(), lr=config.optimizer.lr, weight_decay=config.optimizer.weight_decay)
@@ -58,7 +60,7 @@ def train(config: DictConfig) -> None:
 
             if i % 100 == 0:
                 print(f"Epoch {epoch}, iter {i}, loss: {loss.item()}")
-                #wandb.log({"train_loss": loss.item(), "train_accuracy": accuracy})
+                # wandb.log({"train_loss": loss.item(), "train_accuracy": accuracy})
 
     print("Training complete")
 
@@ -73,16 +75,16 @@ def train(config: DictConfig) -> None:
     final_precision = precision_score(targets, preds.argmax(dim=1), average="weighted")
     final_recall = recall_score(targets, preds.argmax(dim=1), average="weighted")
     final_f1 = f1_score(targets, preds.argmax(dim=1), average="weighted")
-    
+
     # printing model performane metrics for now, but need to log them in wandb later
-    print("\n" + "="*50)
+    print("\n" + "=" * 50)
     print("FINAL TRAINING METRICS")
-    print("="*50)
+    print("=" * 50)
     print(f"Accuracy:  {final_accuracy:.4f}")
     print(f"Precision: {final_precision:.4f}")
     print(f"Recall:    {final_recall:.4f}")
     print(f"F1 Score:  {final_f1:.4f}")
-    print("="*50)
+    print("=" * 50)
 
 
 if __name__ == "__main__":
