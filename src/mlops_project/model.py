@@ -2,6 +2,7 @@ import torch
 from monai.networks.nets import DenseNet121
 from torch import nn
 
+
 class SmallCNN(nn.Module):
     def __init__(self, num_classes=4):
         super().__init__()
@@ -19,6 +20,7 @@ class SmallCNN(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.net(x)
+
 
 class DeepCNN(nn.Module):
     def __init__(self, num_classes=4):
@@ -56,14 +58,15 @@ class DenseNetModel(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.net(x)
 
+
 if __name__ == "__main__":
     model = DenseNetModel(num_classes=4)
     model = SmallCNN(num_classes=4)
     model = DeepCNN(num_classes=4)
-    
+
     print(f"Model architecture: {model}")
     print(f"Number of parameters: {sum(p.numel() for p in model.parameters())}")
     print(type(model))
     x = torch.randn(2, 1, 128, 128)
     y = model(x)
-    print(f'Output shape: {y.shape}')
+    print(f"Output shape: {y.shape}")
