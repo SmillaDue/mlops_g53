@@ -145,7 +145,9 @@ will check the repositories and the code to verify your answers.
 > *We used the third-party framework ... in our project. We used functionality ... and functionality ... from the*
 > *package to do ... and ... in our project*.
 >
-> Answer:
+> Answer: We made use of a package called MONAI, which is a deep learning, PyTorch-based framework specifically designed for medical imaging applications. The overall plan of the project is to implement a model using this framework, train it on medical imaging data, and evaluate the resulting performance. MONAI provides a range of ready-made modules for deep learning architectures, data handling, and training pipelines, which we make use of throughout the project to simplify development and ensure best practices within medical imaging.
+
+In the setup phase, we first familiarize ourselves with the MONAI framework and its core components. We then implement a baseline model using MONAI’s architecture modules and training utilities. To better understand the benefits and limitations of the framework, we compare this MONAI-based model against another deep learning model that is implemented without using the MONAI package. This comparison allows us to assess differences in performance, implementation complexity, and flexibility, and helps us evaluate whether MONAI provides a meaningful advantage for our specific medical imaging task.
 
 --- question 3 fill here ---
 
@@ -165,7 +167,7 @@ will check the repositories and the code to verify your answers.
 > *We used ... for managing our dependencies. The list of dependencies was auto-generated using ... . To get a*
 > *complete copy of our development environment, one would have to run the following commands*
 >
-> Answer:
+> Answer: We used uv to manage our dependencies, as it allows us to automatically handle and update dependencies within the project, removing the tedious job of adding them manually. Whenever we wanted to add a new package, we used the "command uv add <package name>", which automatically added it to the uv lock file that stores all required packages and versions. This approach ensures consistency across the project. In this way, everyone can activate and work within the same virtual environment, provided that we regularly pull updates and work on the most recent version of the project during collaborative team development.
 
 --- question 4 fill here ---
 
@@ -181,7 +183,7 @@ will check the repositories and the code to verify your answers.
 > *because we did not use any ... in our project. We have added an ... folder that contains ... for running our*
 > *experiments.*
 >
-> Answer:
+> Answer: The cookiecutter template is very nicely set up for developing a model and its related files in a clear and well-structured format. We have filled out the data, evaluate, model, train, and visualize files required for the model setup and experimentation. In addition, we completed several of the workflow files to ensure proper version control and automated checks on GitHub. To make sure that figures, plots, and other testing notes are kept in a single, organized location, we used the figures folder within the reports directory to store these outputs. Finally, to properly configure the models and training procedures, we populated the configs folder with the corresponding configuration files for each experiment.
 
 --- question 5 fill here ---
 
@@ -196,7 +198,10 @@ will check the repositories and the code to verify your answers.
 > *We used ... for linting and ... for formatting. We also used ... for typing and ... for documentation. These*
 > *concepts are important in larger projects because ... . For example, typing ...*
 >
-> Answer:
+> Answer: We implemented rules for code quality in the linting file within the workflows folder. For this we use ruff format and ruff check to make sure the code is both consistent with the standard and see if any problems need to be fixed. For documentation we made sure to add relevant comments when necessary. We also documented... 
+
+These concepts matter greatly in larger projects because they make the codebase easier to understand, maintain, and extend over time. When multiple people work on the same project, consistent formatting, typing, and documentation reduce confusion and lower the risk of errors. They also make onboarding new contributors faster and help ensure that changes can be made confidently without breaking existing functionality.
+
 
 --- question 6 fill here ---
 
@@ -215,7 +220,9 @@ will check the repositories and the code to verify your answers.
 > *In total we have implemented X tests. Primarily we are testing ... and ... as these the most critical parts of our*
 > *application but also ... .*
 >
-> Answer:
+> Answer: we implemented tests, which make sure that both the data and the model runs smoothly every time we push something new into the project. It runs both pytests and coverage. 
+For the data it does: check dataset loads correctly, verify the number og samples in training and test set, validate that each image is a 3d tensor in correct format and ensures correct label format. 
+The model test makes sure the model can run with different batch sizes and that the output format is correct. 
 
 --- question 7 fill here ---
 
@@ -230,7 +237,7 @@ will check the repositories and the code to verify your answers.
 > *The total code coverage of code is X%, which includes all our source code. We are far from 100% coverage of our **
 > *code and even if we were then...*
 >
-> Answer:
+> Answer: CAN ONLY BE ANSWERED IN THE END OF PROJECT 
 
 --- question 8 fill here ---
 
@@ -245,7 +252,7 @@ will check the repositories and the code to verify your answers.
 > *We made use of both branches and PRs in our project. In our group, each member had an branch that they worked on in*
 > *addition to the main branch. To merge code we ...*
 >
-> Answer:
+> Answer:Yes, we both made use of both branches and PRs. Everytime we would work on a specific issue/feature of the project, we build a branch related to this such that we might merge it on later. Pull requests were also used to make sure someone has gone through and confirmed the proposed code/update. This gave us a nice workflow because we could perform tests automatically by running it through the workflows we had setup which both checked formatting, quality and coverage, which makes it alot easier to improve and debug relevant code. If we hadn't done this, it would've been a lot harder to solve conflict because nobody would need to approve or test the update. 
 
 --- question 9 fill here ---
 
