@@ -17,9 +17,16 @@ def normalize(images: torch.Tensor) -> torch.Tensor:
     return (images - images.mean()) / images.std()
 
 
-def crop_img(img):
-    """
-    Finds the extreme points on the image and crops the rectangular out of them
+def crop_img(img: np.ndarray) -> np.ndarray:
+    """Crop image to remove black borders using contour detection.
+    
+    Finds the extreme points on the image and crops the rectangular out of them.
+    
+    Args:
+        img: Input image as numpy array in RGB format.
+    
+    Returns:
+        Cropped image as numpy array.
     """
     gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     gray = cv2.GaussianBlur(gray, (3, 3), 0)

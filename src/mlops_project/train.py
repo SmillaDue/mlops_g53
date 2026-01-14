@@ -13,7 +13,23 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.ba
 
 @hydra.main(config_path="../../configs", config_name="default_config.yaml", version_base=None)
 def train(config: DictConfig) -> None:
-    """Train model"""
+    """Train a neural network model on brain tumor classification data.
+    
+    Loads data, splits into train/validation sets, trains the model with the specified
+    hyperparameters, and saves the trained model. Optionally logs metrics to Weights & Biases.
+    
+    Args:
+        config: Hydra configuration containing:
+            - batch_size: Number of samples per batch
+            - epochs: Number of training epochs
+            - seed: Random seed for reproducibility
+            - optimizer: Optimizer configuration (name, lr, weight_decay)
+            - model: Model architecture configuration
+            - wandb: Optional W&B logging configuration (enabled, project, entity, etc.)
+    
+    Returns:
+        None. Saves model to models/model.pth and logs metrics to W&B if enabled.
+    """
     print("Training day and night;)")
     print(f"Using device: {DEVICE}")
 
