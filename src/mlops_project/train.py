@@ -2,7 +2,8 @@ from pathlib import Path
 
 import hydra
 import torch
-from omegaconf import DictConfig
+import wandb
+from omegaconf import DictConfig, OmegaConf
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
 from mlops_project.data import brain_tumor
@@ -25,11 +26,31 @@ def train(config: DictConfig) -> None:
     # Set random seed for reproducibility
     torch.manual_seed(config.seed)
 
+    use_wandb = bool(getattr(config, "wandb", None) and config.wandb.get("enabled", False))
+    log_every = int(config.wandb.get("log_every", 50)) if getattr(config, "wandb", None) else 50
+
+    run = None
+    if use_wandb:
+
+
+        # Hydra configs are not plain dicts; convert safely
+        cfg_dict = OmegaConf.to_container(config, resolve=True)
+
+        run = wandb.init(
+            project=config.wandb.get("project", "brainy_mlops"),
+            entity=config.wandb.get("entity", None),  
+            name=config.wandb.get("name", None),      
+            tags=config.wandb.get("tags", None),      
+            config=cfg_dict,
+        )
+        
+        wandb.config.update({"device": str(DEVICE)}, allow_val_change=True)
+
     train_set, _ = brain_tumor()
     model = hydra.utils.instantiate(config.model).to(DEVICE)
 
     # Create a DataLoader to batch and shuffle the training data
-    train_dataloader = torch.utils.data.DataLoader(train_set, batch_size=batch_size)
+    train_dataloader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True)
 
     loss_fn = torch.nn.CrossEntropyLoss()
 
@@ -37,10 +58,15 @@ def train(config: DictConfig) -> None:
     optimizer_class = getattr(torch.optim, config.optimizer.name, torch.optim.Adam)
     optimizer = optimizer_class(model.parameters(), lr=config.optimizer.lr, weight_decay=config.optimizer.weight_decay)
 
+    global_step = 0
+    all_preds = []
+    all_targets = []
+
     for epoch in range(epochs):
         model.train()
-        preds = []
-        targets = []
+        running_loss = 0.0
+        running_acc = 0.0
+        num_batches = 0
         # Iterate over batches in the training data
         for i, (img, target) in enumerate(train_dataloader):
             # Move data to the appropriate device
@@ -54,38 +80,91 @@ def train(config: DictConfig) -> None:
             # Update model parameters
             optimizer.step()
 
+            batch_loss = float(loss.item())
+            batch_acc = float((y_pred.argmax(dim=1) == target).float().mean().item())
+
+            running_loss += batch_loss
+            running_acc += batch_acc
+            num_batches += 1
+
             # Calculate and record accuracy for this batch
-            accuracy = (y_pred.argmax(dim=1) == target).float().mean().item()
-            preds.append(y_pred.detach().cpu())
-            targets.append(target.detach().cpu())
+            if epoch == epochs - 1:
+                all_preds.append(y_pred.detach().cpu())
+                all_targets.append(target.detach().cpu())
 
             if i % 100 == 0:
                 print(f"Epoch {epoch}, iter {i}, loss: {loss.item()}")
                 # wandb.log({"train_loss": loss.item(), "train_accuracy": accuracy})
+            
+            if use_wandb and (global_step % log_every == 0):
+                wandb.log(
+                    {
+                        "train/loss_step": batch_loss,
+                        "train/acc_step": batch_acc,
+                        "train/lr": optimizer.param_groups[0]["lr"],
+                        "epoch": epoch,
+                    },
+                    step=global_step,
+                )
+            global_step += 1
+
+        epoch_loss = running_loss / max(1, num_batches)
+        epoch_acc = running_acc / max(1, num_batches)
+
+        if use_wandb:
+            wandb.log(
+                {"train/loss_epoch": epoch_loss, "train/acc_epoch": epoch_acc},
+                step=global_step,
+            )
 
     print("Training complete")
 
     # Save the trained model's parameters to models folder
     Path("models").mkdir(parents=True, exist_ok=True)
-    torch.save(model.state_dict(), "models/model.pth")
+    model_path = Path("models/model.pth")
+    torch.save(model.state_dict(), model_path)
 
     # getting the model performance metrics
-    preds = torch.cat(preds, 0)
-    targets = torch.cat(targets, 0)
+    preds = torch.cat(all_preds, 0)
+    targets = torch.cat(all_targets, 0)
+    pred_labels = preds.argmax(dim=1)
+
     final_accuracy = accuracy_score(targets, preds.argmax(dim=1))
     final_precision = precision_score(targets, preds.argmax(dim=1), average="weighted", zero_division=0)
     final_recall = recall_score(targets, preds.argmax(dim=1), average="weighted", zero_division=0)
     final_f1 = f1_score(targets, preds.argmax(dim=1), average="weighted", zero_division=0)
 
     # printing model performane metrics for now, but need to log them in wandb later
-    print("\n" + "=" * 50)
-    print("FINAL TRAINING METRICS")
-    print("=" * 50)
-    print(f"Accuracy:  {final_accuracy:.4f}")
-    print(f"Precision: {final_precision:.4f}")
-    print(f"Recall:    {final_recall:.4f}")
-    print(f"F1 Score:  {final_f1:.4f}")
-    print("=" * 50)
+    #print("\n" + "=" * 50)
+    #print("FINAL TRAINING METRICS")
+    #print("=" * 50)
+    #print(f"Accuracy:  {final_accuracy:.4f}")
+    #print(f"Precision: {final_precision:.4f}")
+    #print(f"Recall:    {final_recall:.4f}")
+    #print(f"F1 Score:  {final_f1:.4f}")
+    #print("=" * 50)
+
+    if use_wandb:
+        wandb.log(
+            {
+                "train/accuracy_final": final_accuracy,
+                "train/precision_final": final_precision,
+                "train/recall_final": final_recall,
+                "train/f1_final": final_f1,
+            },
+            step=global_step,
+        )
+
+        if config.wandb.get("log_model", True):
+            artifact = wandb.Artifact(
+                name="model",
+                type="checkpoint",
+                metadata={"framework": "pytorch"},
+            )
+            artifact.add_file(str(model_path))
+            wandb.log_artifact(artifact)
+
+        wandb.finish()
 
 
 if __name__ == "__main__":
