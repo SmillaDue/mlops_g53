@@ -1,5 +1,13 @@
 _target_: mlops_project.model.DenseNetModel
-# Add any hyperparameters for DenseNetModel here
-# For example:
-# num_classes: 10
-# growth_rate: 32
+
+in_channels: ${in_channels}
+num_classes: ${num_classes}
+
+spatial_dims: 2
+
+pretrained: false
+
+init_features: 64
+growth_rate: 32
+block_config: [6, 12, 24, 16]
+dropout_prob: 0.0

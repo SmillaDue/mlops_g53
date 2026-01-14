@@ -11,20 +11,23 @@ PYTHON_VERSION = "3.13"
 @task
 def preprocess_data(ctx: Context) -> None:
     """Preprocess data."""
-    ctx.run(f"uv run src/{PROJECT_NAME}/data.py data/raw data/processed", echo=True, pty=not WINDOWS)
+    pythonpath = f"PYTHONPATH={os.getcwd()}/src" if not WINDOWS else f"set PYTHONPATH={os.getcwd()}\\src &&"
+    ctx.run(f"{pythonpath} uv run python -m {PROJECT_NAME}.data data/raw data/processed", echo=True, pty=not WINDOWS)
 
 
 @task
 def train(ctx: Context) -> None:
     """Train model."""
-    ctx.run(f"uv run src/{PROJECT_NAME}/train.py", echo=True, pty=not WINDOWS)
+    pythonpath = f"PYTHONPATH={os.getcwd()}/src" if not WINDOWS else f"set PYTHONPATH={os.getcwd()}\\src &&"
+    ctx.run(f"{pythonpath} uv run python -m {PROJECT_NAME}.train", echo=True, pty=not WINDOWS)
 
 
 @task
 def test(ctx: Context) -> None:
     """Run tests."""
-    ctx.run("uv run coverage run -m pytest tests/", echo=True, pty=not WINDOWS)
-    ctx.run("uv run coverage report -m -i", echo=True, pty=not WINDOWS)
+    pythonpath = f"PYTHONPATH={os.getcwd()}/src" if not WINDOWS else f"set PYTHONPATH={os.getcwd()}\\src &&"
+    ctx.run(f"{pythonpath} uv run coverage run -m pytest tests/", echo=True, pty=not WINDOWS)
+    ctx.run(f"{pythonpath} uv run coverage report -m -i", echo=True, pty=not WINDOWS)
 
 
 @task
