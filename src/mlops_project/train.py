@@ -14,6 +14,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.ba
 def train(config: DictConfig) -> None:
     """Train model"""
     print("Training day and night;)")
+    print(f"Using device: {DEVICE}")
 
     # Extract hyperparameters from config
     batch_size = config.batch_size
@@ -24,7 +25,7 @@ def train(config: DictConfig) -> None:
     # Set random seed for reproducibility
     torch.manual_seed(config.seed)
 
-    train_set, _ = brain_tumor()  
+    train_set, _ = brain_tumor()
     model = hydra.utils.instantiate(config.model).to(DEVICE)
 
     # Create a DataLoader to batch and shuffle the training data
