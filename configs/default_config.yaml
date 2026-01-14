@@ -1,3 +1,8 @@
 defaults:
     - model: densenet  # options: smallcnn, deepcnn, densenet
     - training_conf
+    - model_conf
+
+# glocbal model parameters
+num_classes: 4
+in_channels: 1
