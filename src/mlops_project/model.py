@@ -22,11 +22,9 @@ class SmallCNN(nn.Module):
             nn.Conv2d(in_channels, c1, kernel_size, padding=padding),
             nn.ReLU(),
             nn.MaxPool2d(pool_kernel),
-
             nn.Conv2d(c1, c2, kernel_size, padding=padding),
             nn.ReLU(),
             nn.MaxPool2d(pool_kernel),
-
             nn.AdaptiveAvgPool2d(1),
             nn.Flatten(),
             nn.Dropout(dropout),
