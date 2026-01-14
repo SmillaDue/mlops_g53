@@ -26,11 +26,11 @@ def test_data_loading(img_size: int = 256):
                 sample_img.ndim == 3
             ), f"Expected image to have 3 dimensions (C, H, W), got {sample_img.ndim}, at index {i}"
             assert (
-                sample_img.shape[0] == 3
-            ), f"Expected image to have 3 channels, got {sample_img.shape[0]}, at index {i}"
+                sample_img.shape[0] == 1
+            ), f"Expected image to have 1 channel (grayscale), got {sample_img.shape[0]}, at index {i}"
             assert sample_img.shape == torch.Size(
-                [3, img_size, img_size]
-            ), f"Expected image size to be 3x{img_size}x{img_size}, got {sample_img.shape}, at index {i}"
+                [1, img_size, img_size]
+            ), f"Expected image size to be 1x{img_size}x{img_size}, got {sample_img.shape}, at index {i}"
 
             assert (
                 isinstance(sample_label, torch.Tensor)

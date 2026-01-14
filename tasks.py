@@ -23,6 +23,16 @@ def train(ctx: Context) -> None:
 
 
 @task
+def evaluate(ctx: Context, args: str = "") -> None:
+    """Evaluate trained model. Pass Hydra args like: uvx invoke evaluate --args='model=smallcnn'"""
+    pythonpath = f"PYTHONPATH={os.getcwd()}/src" if not WINDOWS else f"set PYTHONPATH={os.getcwd()}\\src &&"
+    cmd = f"{pythonpath} uv run python -m {PROJECT_NAME}.evaluate"
+    if args:
+        cmd += f" {args}"
+    ctx.run(cmd, echo=True, pty=not WINDOWS)
+
+
+@task
 def test(ctx: Context) -> None:
     """Run tests."""
     pythonpath = f"PYTHONPATH={os.getcwd()}/src" if not WINDOWS else f"set PYTHONPATH={os.getcwd()}\\src &&"
