@@ -1,6 +1,11 @@
 _target_: mlops_project.model.DeepCNN
-# Add any hyperparameters for DeepCNN here
-# For example:
-# in_channels: 3
-# num_classes: 10
-# dropout_rate: 0.5
+
+in_channels: ${in_channels}
+num_classes: ${num_classes}
+
+channels: [32, 64, 128]
+kernel_size: 3
+padding: 1
+pool_kernel: 2
+use_batchnorm: true
+dropout: 0.1
