@@ -14,10 +14,10 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.ba
 @hydra.main(config_path="../../configs", config_name="default_config.yaml", version_base=None)
 def train(config: DictConfig) -> None:
     """Train a neural network model on brain tumor classification data.
-    
+
     Loads data, splits into train/validation sets, trains the model with the specified
     hyperparameters, and saves the trained model. Optionally logs metrics to Weights & Biases.
-    
+
     Args:
         config: Hydra configuration containing:
             - batch_size: Number of samples per batch
@@ -26,7 +26,7 @@ def train(config: DictConfig) -> None:
             - optimizer: Optimizer configuration (name, lr, weight_decay)
             - model: Model architecture configuration
             - wandb: Optional W&B logging configuration (enabled, project, entity, etc.)
-    
+
     Returns:
         None. Saves model to models/model.pth and logs metrics to W&B if enabled.
     """
@@ -47,30 +47,28 @@ def train(config: DictConfig) -> None:
 
     run = None
     if use_wandb:
-
-
         # Hydra configs are not plain dicts; convert safely
         cfg_dict = OmegaConf.to_container(config, resolve=True)
 
         run = wandb.init(
             project=config.wandb.get("project", "brainy_mlops"),
-            entity=config.wandb.get("entity", None),  
-            name=config.wandb.get("name", None),      
-            tags=config.wandb.get("tags", None),      
+            entity=config.wandb.get("entity", None),
+            name=config.wandb.get("name", None),
+            tags=config.wandb.get("tags", None),
             config=cfg_dict,
         )
-        
+
         wandb.config.update({"device": str(DEVICE)}, allow_val_change=True)
 
     train_set, _ = brain_tumor()
-    
+
     # Split into 90% train, 10% validation
     train_size = int(0.9 * len(train_set))
     val_size = len(train_set) - train_size
     train_subset, val_subset = torch.utils.data.random_split(
         train_set, [train_size, val_size], generator=torch.Generator().manual_seed(config.seed)
     )
-    
+
     model = hydra.utils.instantiate(config.model).to(DEVICE)
 
     # Create DataLoaders
@@ -120,7 +118,7 @@ def train(config: DictConfig) -> None:
             if i % 100 == 0:
                 print(f"Epoch {epoch}, iter {i}, loss: {loss.item()}")
                 # wandb.log({"train_loss": loss.item(), "train_accuracy": accuracy})
-            
+
             if use_wandb and (global_step % log_every == 0):
                 wandb.log(
                     {
@@ -135,7 +133,7 @@ def train(config: DictConfig) -> None:
 
         epoch_loss = running_loss / max(1, num_batches)
         epoch_acc = running_acc / max(1, num_batches)
-        
+
         # Validation
         model.eval()
         val_loss = 0.0
@@ -150,13 +148,19 @@ def train(config: DictConfig) -> None:
                 val_batches += 1
         val_loss /= max(1, val_batches)
         val_acc /= max(1, val_batches)
-        
-        print(f"Epoch {epoch}: Train Loss={epoch_loss:.4f}, Acc={epoch_acc:.4f} | Val Loss={val_loss:.4f}, Acc={val_acc:.4f}")
+
+        print(
+            f"Epoch {epoch}: Train Loss={epoch_loss:.4f}, Acc={epoch_acc:.4f} | Val Loss={val_loss:.4f}, Acc={val_acc:.4f}"
+        )
 
         if use_wandb:
             wandb.log(
-                {"train/loss_epoch": epoch_loss, "train/acc_epoch": epoch_acc,
-                 "val/loss_epoch": val_loss, "val/acc_epoch": val_acc},
+                {
+                    "train/loss_epoch": epoch_loss,
+                    "train/acc_epoch": epoch_acc,
+                    "val/loss_epoch": val_loss,
+                    "val/acc_epoch": val_acc,
+                },
                 step=global_step,
             )
 

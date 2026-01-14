@@ -58,7 +58,9 @@ def docker_build(ctx: Context, progress: str = "plain") -> None:
 def build_docs(ctx: Context) -> None:
     """Build documentation."""
     pythonpath = f"PYTHONPATH={os.getcwd()}/src" if not WINDOWS else f"set PYTHONPATH={os.getcwd()}\\src &&"
-    ctx.run(f"{pythonpath} uv run mkdocs build --config-file docs/mkdocs.yaml --site-dir build", echo=True, pty=not WINDOWS)
+    ctx.run(
+        f"{pythonpath} uv run mkdocs build --config-file docs/mkdocs.yaml --site-dir build", echo=True, pty=not WINDOWS
+    )
 
 
 @task

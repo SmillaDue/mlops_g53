@@ -19,12 +19,12 @@ def normalize(images: torch.Tensor) -> torch.Tensor:
 
 def crop_img(img: np.ndarray) -> np.ndarray:
     """Crop image to remove black borders using contour detection.
-    
+
     Finds the extreme points on the image and crops the rectangular out of them.
-    
+
     Args:
         img: Input image as numpy array in RGB format.
-    
+
     Returns:
         Cropped image as numpy array.
     """
