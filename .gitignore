@@ -178,3 +178,13 @@ cython_debug/
 
 # PyTorch model files
 *.pt
+*.pth
+
+# Processed data
+data/processed/
+
+# Model checkpoints
+models/
+
+# Hydra outputs
+outputs/

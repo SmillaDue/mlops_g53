@@ -1,6 +1,6 @@
 # Training hyperparameters
 batch_size: 32
-epochs: 10
+epochs: 5
 seed: 42
 
 # Optimizer configuration
