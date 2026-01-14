@@ -34,6 +34,7 @@ data_transforms = Compose(
         CropImage(),
         ToTensor(),
         EnsureChannelFirst(channel_dim=-1),
+        ToGrayCHW(),
         Resize((IMG_SIZE, IMG_SIZE)),
         NormalizeImage(),
         ScaleIntensity(),
@@ -46,7 +47,6 @@ data_transforms_simple = Compose(
         EnsureChannelFirst(channel_dim=-1),
         ToGrayCHW(),
         Resize((IMG_SIZE, IMG_SIZE)),
-        NormalizeImage(),
         ScaleIntensity(),
     ]
 )
@@ -207,4 +207,4 @@ datatransforms: \n{describe_compose(data_transforms) if transform_type == "crop"
 
 
 if __name__ == "__main__":
-    dataset_statistics()
+    dataset_statistics(transform_type="crop")
