@@ -1,11 +1,12 @@
-import torch
 import hydra
+import torch
 from omegaconf import DictConfig
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
 from mlops_project.data import brain_tumor
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+
 
 @hydra.main(config_path="../../configs", config_name="default_config.yaml", version_base=None)
 def evaluate(config: DictConfig) -> None:
@@ -30,7 +31,7 @@ def evaluate(config: DictConfig) -> None:
     model.eval()
     preds = []
     targets = []
-    
+
     # Iterate over test batches
     with torch.no_grad():
         for img, target in test_dataloader:
@@ -38,17 +39,17 @@ def evaluate(config: DictConfig) -> None:
             y_pred = model(img)
             preds.append(y_pred.cpu())
             targets.append(target.cpu())
-    
+
     # Concatenate all predictions and targets
     preds = torch.cat(preds, 0)
     targets = torch.cat(targets, 0)
-    
+
     # Calculate metrics
     test_accuracy = accuracy_score(targets, preds.argmax(dim=1))
     test_precision = precision_score(targets, preds.argmax(dim=1), average="weighted", zero_division=0)
     test_recall = recall_score(targets, preds.argmax(dim=1), average="weighted", zero_division=0)
     test_f1 = f1_score(targets, preds.argmax(dim=1), average="weighted", zero_division=0)
-    
+
     # Print evaluation metrics
     print("\n" + "=" * 50)
     print("TEST EVALUATION METRICS")
