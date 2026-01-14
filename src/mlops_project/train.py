@@ -47,10 +47,19 @@ def train(config: DictConfig) -> None:
         wandb.config.update({"device": str(DEVICE)}, allow_val_change=True)
 
     train_set, _ = brain_tumor()
+    
+    # Split into 90% train, 10% validation
+    train_size = int(0.9 * len(train_set))
+    val_size = len(train_set) - train_size
+    train_subset, val_subset = torch.utils.data.random_split(
+        train_set, [train_size, val_size], generator=torch.Generator().manual_seed(config.seed)
+    )
+    
     model = hydra.utils.instantiate(config.model).to(DEVICE)
 
-    # Create a DataLoader to batch and shuffle the training data
-    train_dataloader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True)
+    # Create DataLoaders
+    train_dataloader = torch.utils.data.DataLoader(train_subset, batch_size=batch_size, shuffle=True)
+    val_dataloader = torch.utils.data.DataLoader(val_subset, batch_size=batch_size, shuffle=False)
 
     loss_fn = torch.nn.CrossEntropyLoss()
 
@@ -110,10 +119,28 @@ def train(config: DictConfig) -> None:
 
         epoch_loss = running_loss / max(1, num_batches)
         epoch_acc = running_acc / max(1, num_batches)
+        
+        # Validation
+        model.eval()
+        val_loss = 0.0
+        val_acc = 0.0
+        val_batches = 0
+        with torch.no_grad():
+            for img, target in val_dataloader:
+                img, target = img.to(DEVICE), target.to(DEVICE)
+                y_pred = model(img)
+                val_loss += loss_fn(y_pred, target).item()
+                val_acc += (y_pred.argmax(dim=1) == target).float().mean().item()
+                val_batches += 1
+        val_loss /= max(1, val_batches)
+        val_acc /= max(1, val_batches)
+        
+        print(f"Epoch {epoch}: Train Loss={epoch_loss:.4f}, Acc={epoch_acc:.4f} | Val Loss={val_loss:.4f}, Acc={val_acc:.4f}")
 
         if use_wandb:
             wandb.log(
-                {"train/loss_epoch": epoch_loss, "train/acc_epoch": epoch_acc},
+                {"train/loss_epoch": epoch_loss, "train/acc_epoch": epoch_acc,
+                 "val/loss_epoch": val_loss, "val/acc_epoch": val_acc},
                 step=global_step,
             )
 
@@ -133,16 +160,6 @@ def train(config: DictConfig) -> None:
     final_precision = precision_score(targets, preds.argmax(dim=1), average="weighted", zero_division=0)
     final_recall = recall_score(targets, preds.argmax(dim=1), average="weighted", zero_division=0)
     final_f1 = f1_score(targets, preds.argmax(dim=1), average="weighted", zero_division=0)
-
-    # printing model performane metrics for now, but need to log them in wandb later
-    #print("\n" + "=" * 50)
-    #print("FINAL TRAINING METRICS")
-    #print("=" * 50)
-    #print(f"Accuracy:  {final_accuracy:.4f}")
-    #print(f"Precision: {final_precision:.4f}")
-    #print(f"Recall:    {final_recall:.4f}")
-    #print(f"F1 Score:  {final_f1:.4f}")
-    #print("=" * 50)
 
     if use_wandb:
         wandb.log(
