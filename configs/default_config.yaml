@@ -5,3 +5,12 @@ defaults:
 # glocbal model parameters
 num_classes: 4
 in_channels: 1
+
+wandb:
+  enabled: true
+  project: smallcnn
+  entity: brainy_mlops
+  name: first_run
+  tags: []
+  log_every: 50
+  log_model: true
