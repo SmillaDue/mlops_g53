@@ -52,8 +52,9 @@ data_transforms = Compose(
     [
         lambda img: cv2.imread(str(img)),
         crop_img,
+        lambda img: cv2.cvtColor(img, cv2.COLOR_RGB2GRAY),
+        lambda img: img[None, ...],  # Add channel dimension: (H, W) -> (1, H, W)
         ToTensor(),
-        EnsureChannelFirst(channel_dim=-1),
         Resize((IMG_SIZE, IMG_SIZE)),
         normalize,
     ]
@@ -166,15 +167,16 @@ def preprocess_data(raw_data_dir: str, processed_data_dir: str):
     # ### PREPROCESSING
     processed_x, processed_y = [], []
     for path_str, label in zip(train_x, train_y):
-        processed_img = data_transforms(path_str)  # (3,H, W)
+        processed_img = data_transforms(path_str)  # (1,H, W)
         processed_img = processed_img.float()
         processed_x.append(processed_img)
         processed_y.append(label)
 
-    X = torch.stack(processed_x, dim=0)  # (N,3,H,W)
+    X = torch.stack(processed_x, dim=0)  # (N,1,H,W)
     y = torch.tensor(processed_y, dtype=torch.long)  # (N,), long
 
     out_dir = Path(processed_data_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
     torch.save(X, out_dir / "train_images.pt")
     torch.save(y, out_dir / "train_targets.pt")
 
@@ -182,13 +184,13 @@ def preprocess_data(raw_data_dir: str, processed_data_dir: str):
     processed_test_x, processed_test_y = [], []
     for path_str, label in zip(test_x, test_y):
         img_path = Path(path_str)
-        processed_img = data_transforms(img_path)  # (3,H, W)
+        processed_img = data_transforms(img_path)  # (1,H, W)
         processed_img = processed_img.float()
 
         processed_test_x.append(processed_img)
         processed_test_y.append(label)
 
-    X_test = torch.stack(processed_test_x, dim=0)  # (N,3,H,W)
+    X_test = torch.stack(processed_test_x, dim=0)  # (N,1,H,W)
     y_test = torch.tensor(processed_test_y, dtype=torch.long)  # (N,), long
 
     torch.save(X_test, out_dir / "test_images.pt")

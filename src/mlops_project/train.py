@@ -5,7 +5,7 @@ import torch
 from omegaconf import DictConfig
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
-from mlops_project.data import MyDataset
+from mlops_project.data import brain_tumor
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
@@ -24,7 +24,7 @@ def train(config: DictConfig) -> None:
     # Set random seed for reproducibility
     torch.manual_seed(config.seed)
 
-    train_set, _ = MyDataset("data/raw")  # NEEDS TO BE CHANGED WHEN DATA IS READY
+    train_set, _ = brain_tumor()  
     model = hydra.utils.instantiate(config.model).to(DEVICE)
 
     # Create a DataLoader to batch and shuffle the training data
@@ -72,9 +72,9 @@ def train(config: DictConfig) -> None:
     preds = torch.cat(preds, 0)
     targets = torch.cat(targets, 0)
     final_accuracy = accuracy_score(targets, preds.argmax(dim=1))
-    final_precision = precision_score(targets, preds.argmax(dim=1), average="weighted")
-    final_recall = recall_score(targets, preds.argmax(dim=1), average="weighted")
-    final_f1 = f1_score(targets, preds.argmax(dim=1), average="weighted")
+    final_precision = precision_score(targets, preds.argmax(dim=1), average="weighted", zero_division=0)
+    final_recall = recall_score(targets, preds.argmax(dim=1), average="weighted", zero_division=0)
+    final_f1 = f1_score(targets, preds.argmax(dim=1), average="weighted", zero_division=0)
 
     # printing model performane metrics for now, but need to log them in wandb later
     print("\n" + "=" * 50)
