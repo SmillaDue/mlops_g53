@@ -1,29 +1,31 @@
+import os
+from typing import Literal
+
+import matplotlib.pyplot as plt
+import monai
 import torch
-from torch import Tensor
-from torch.utils.data import Dataset
 from monai.transforms import (
     Compose,
     EnsureChannelFirst,
+    LoadImage,
     RandFlip,
     RandRotate,
     RandZoom,
     Resize,
-    ToTensor,
-    LoadImage,
     ScaleIntensity,
+    ToTensor,
 )
-import monai
-import os
+from torch import Tensor
+from torch.utils.data import Dataset
+
 from mlops_project.utils import (
-    show_image_and_target,
-    describe_compose,
-    ToGrayCHW,
-    LoadImageFromCV,
     CropImage,
+    LoadImageFromCV,
     NormalizeImage,
+    ToGrayCHW,
+    describe_compose,
+    show_image_and_target,
 )
-import matplotlib.pyplot as plt
-from typing import Literal
 
 IMG_SIZE = 256
 data_transforms = Compose(
