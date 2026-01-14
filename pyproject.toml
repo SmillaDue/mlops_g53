@@ -65,7 +65,14 @@ lint.select = ["I"]
 
 [tool.coverage.run]
 source = ["src"]
-omit = ["tests/*"]
+omit = [
+    "tests/*",
+    "*/__init__.py",
+]
+branch = true
 
 [tool.coverage.report]
 fail_under = 0
+precision = 2
+show_missing = true
+skip_covered = false
