@@ -26,4 +26,8 @@ WORKDIR /
 ENV UV_LINK_MODE=copy
 RUN --mount=type=cache,target=/root/.cache/uv uv sync
 
-ENTRYPOINT ["uv", "run", "src/mlops_project/train.py"]
+COPY scripts/entrypoint_train.sh /entrypoint_train.sh
+RUN chmod +x /entrypoint_train.sh
+ENTRYPOINT ["/entrypoint_train.sh"]
+
+#ENTRYPOINT ["uv", "run", "src/mlops_project/train.py"]

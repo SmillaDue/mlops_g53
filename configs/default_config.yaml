@@ -14,3 +14,5 @@ wandb:
   tags: []
   log_every: 50
   log_model: true
+
+max_steps: -1

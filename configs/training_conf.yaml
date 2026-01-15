@@ -8,3 +8,5 @@ optimizer:
     name: Adam  # Options: Adam, SGD, AdamW, RMSprop, etc.
     lr: 0.001
     weight_decay: 0
+
+print_every: 10
