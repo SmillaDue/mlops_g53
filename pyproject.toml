@@ -26,6 +26,7 @@ dependencies = [
     "numpy>=2.4.0",
     "opencv-python>=4.11.0.86",
     "scikit-learn>=1.8.0",
+    "snakeviz>=2.2.2",
     "torch==2.6.0",
     "torchvision>=0.21.0",
     "typer==0.21.1",

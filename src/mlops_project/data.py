@@ -1,72 +1,26 @@
 import os
 from pathlib import Path
 
-import cv2
-import imutils
-import numpy as np
 import torch
-from monai.transforms import Compose, EnsureChannelFirst, RandFlip, RandRotate, RandZoom, Resize, ToTensor, Transform
+from monai.transforms import Compose, EnsureChannelFirst, Resize, ToTensor
 from PIL import Image
+
+from mlops_project.utils import CropImage, LoadImageFromCV, NormalizeImage, ToGrayCHW
 
 # hyperparameter
 IMG_SIZE = 256
 
-
-def normalize(images: torch.Tensor) -> torch.Tensor:
-    """Normalize images."""
-    return (images - images.mean()) / images.std()
-
-
-def crop_img(img: np.ndarray) -> np.ndarray:
-    """Crop image to remove black borders using contour detection.
-
-    Finds the extreme points on the image and crops the rectangular out of them.
-
-    Args:
-        img: Input image as numpy array in RGB format.
-
-    Returns:
-        Cropped image as numpy array.
-    """
-    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    gray = cv2.GaussianBlur(gray, (3, 3), 0)
-
-    # threshold the image, then perform a series of erosions +
-    # dilations to remove any small regions of noise
-    thresh = cv2.threshold(gray, 45, 255, cv2.THRESH_BINARY)[1]
-    thresh = cv2.erode(thresh, None, iterations=2)
-    thresh = cv2.dilate(thresh, None, iterations=2)
-
-    # find contours in thresholded image, then grab the largest one
-    cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    cnts = imutils.grab_contours(cnts)
-    c = max(cnts, key=cv2.contourArea)
-
-    # find the extreme points
-    extLeft = tuple(c[c[:, :, 0].argmin()][0])
-    extRight = tuple(c[c[:, :, 0].argmax()][0])
-    extTop = tuple(c[c[:, :, 1].argmin()][0])
-    extBot = tuple(c[c[:, :, 1].argmax()][0])
-    ADD_PIXELS = 0
-    new_img = img[
-        extTop[1] - ADD_PIXELS : extBot[1] + ADD_PIXELS, extLeft[0] - ADD_PIXELS : extRight[0] + ADD_PIXELS
-    ].copy()
-
-    return new_img
-
-
 data_transforms = Compose(
     [
-        lambda img: cv2.imread(str(img)),
-        crop_img,
-        lambda img: cv2.cvtColor(img, cv2.COLOR_RGB2GRAY),
-        lambda img: img[None, ...],  # Add channel dimension: (H, W) -> (1, H, W)
+        LoadImageFromCV(),
+        CropImage(),
         ToTensor(),
+        EnsureChannelFirst(channel_dim=-1),
+        ToGrayCHW(),
         Resize((IMG_SIZE, IMG_SIZE)),
-        normalize,
+        NormalizeImage(),
     ]
 )
-
 
 #### Load training data ######
 def load_data(raw_data_dir: str):
@@ -169,7 +123,7 @@ def preprocess_data(raw_data_dir: str, processed_data_dir: str):
 
     #### Load training data ######
     train_x, train_y, test_x, test_y, class_names = load_data(raw_data_dir)  # lists containing file paths and labels
-
+    
     # TRAINING DATA
     # ### PREPROCESSING
     processed_x, processed_y = [], []

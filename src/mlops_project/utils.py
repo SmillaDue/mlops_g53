@@ -4,6 +4,7 @@ import cv2
 import imutils
 import matplotlib.pyplot as plt
 import monai
+import numpy as np
 import torch
 from monai.transforms import Transform
 
@@ -21,11 +22,18 @@ class CropImage(Transform):
     """Crop image using extreme points."""
 
     def __call__(self, img):
-        return self.crop(img)
+        return self.crop_img(img)
 
-    def crop(self, img):
-        """
-        Finds the extreme points on the image and crops the rectangular out of them
+    def crop_img(self, img: np.ndarray) -> np.ndarray:
+        """Crop image to remove black borders using contour detection.
+
+        Finds the extreme points on the image and crops the rectangular out of them.
+
+        Args:
+            img: Input image as numpy array in RGB format.
+
+        Returns:
+            Cropped image as numpy array.
         """
         gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         gray = cv2.GaussianBlur(gray, (3, 3), 0)
@@ -52,7 +60,6 @@ class CropImage(Transform):
         ].copy()
 
         return new_img
-
 
 class LoadImageFromCV(Transform):
     """Load image using OpenCV."""
@@ -81,7 +88,6 @@ class ToGrayCHW(Transform):
 
         return x
 
-
 def describe_compose(c: monai.transforms.Compose) -> None:
     """
     Utility function to describe the transforms in a Compose object
@@ -90,7 +96,7 @@ def describe_compose(c: monai.transforms.Compose) -> None:
 
 
 def show_image_and_target(images, targets, show=True):
-    """Display images with their corresponding targets in a single grid."""
+    """Display images with their corresponding targets in a grid."""
 
     n = len(images)
     cols = int(math.sqrt(n))

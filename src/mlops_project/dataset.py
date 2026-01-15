@@ -190,6 +190,9 @@ datatransforms: \n{describe_compose(data_transforms) if transform_type == "crop"
 
     train_label_distribution = torch.bincount(train_dataset.target)
     test_label_distribution = torch.bincount(test_dataset.target)
+    
+    train_label_counts = {i: count.item() for i, count in enumerate(train_label_distribution)}
+    test_label_counts = {i: count.item() for i, count in enumerate(test_label_distribution)}
 
     plt.bar(torch.arange(4), train_label_distribution)
     plt.title("Train label distribution")
@@ -204,7 +207,8 @@ datatransforms: \n{describe_compose(data_transforms) if transform_type == "crop"
     plt.ylabel("Count")
     plt.savefig("reports/figures/dataset/test_label_distribution.png")
     plt.close()
-
+    
+    return train_label_counts, test_label_counts
 
 if __name__ == "__main__":
     dataset_statistics(transform_type="crop")
