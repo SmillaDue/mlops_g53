@@ -209,10 +209,12 @@ def preprocess_data(raw_data_dir: str, processed_data_dir: str):
 
 def brain_tumor() -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
     """Return train and test datasets for corrupt MNIST."""
-    train_images = torch.load("data/processed/train_images.pt", weights_only=False)
-    train_target = torch.load("data/processed/train_targets.pt", weights_only=False)
-    test_images = torch.load("data/processed/test_images.pt", weights_only=False)
-    test_target = torch.load("data/processed/test_targets.pt", weights_only=False)
+    base_dir = Path(os.environ.get("DATA_DIR", "data/processed"))
+    
+    train_images = torch.load(base_dir / "train_images.pt", weights_only=False)
+    train_target = torch.load(base_dir / "train_targets.pt", weights_only=False)
+    test_images  = torch.load(base_dir / "test_images.pt", weights_only=False)
+    test_target  = torch.load(base_dir / "test_targets.pt", weights_only=False)
 
     train_set = torch.utils.data.TensorDataset(train_images, train_target)
     test_set = torch.utils.data.TensorDataset(test_images, test_target)
