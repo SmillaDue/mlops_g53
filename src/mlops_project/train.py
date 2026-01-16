@@ -36,6 +36,7 @@ def train(config: DictConfig) -> None:
     # Extract hyperparameters from config
     batch_size = config.batch_size
     epochs = config.epochs
+    max_steps = int(getattr(config, "max_steps", -1))
 
     print(f"lr={config.optimizer.lr}, {batch_size=}, {epochs=}")
 
@@ -115,7 +116,8 @@ def train(config: DictConfig) -> None:
                 all_preds.append(y_pred.detach().cpu())
                 all_targets.append(target.detach().cpu())
 
-            if i % 100 == 0:
+            print_every = int(getattr(config, "print_every", 10))
+            if i % print_every == 0:
                 print(f"Epoch {epoch}, iter {i}, loss: {loss.item()}")
                 # wandb.log({"train_loss": loss.item(), "train_accuracy": accuracy})
 
@@ -130,6 +132,11 @@ def train(config: DictConfig) -> None:
                     step=global_step,
                 )
             global_step += 1
+            if max_steps > 0 and global_step >= max_steps:
+                print(f"[SMOKE TEST] Reached max_steps={max_steps}. Exiting early.")
+                if use_wandb:
+                    wandb.finish()
+                return
 
         epoch_loss = running_loss / max(1, num_batches)
         epoch_acc = running_acc / max(1, num_batches)
