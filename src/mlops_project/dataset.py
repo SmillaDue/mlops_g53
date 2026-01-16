@@ -81,7 +81,7 @@ def dataset_statistics(
     transform_type: Literal['crop', 'no-crop'] = 'crop',
     datadir: str = "data/raw",
     seed: int | None = 37,
-    img_name: str = 'braintumor_images_cropped',
+    img_name: str = 'cropped_images',
     plot: bool = True
 ) -> None:
     """
@@ -161,4 +161,4 @@ seed: {seed}
     return train_label_counts, test_label_counts
 
 if __name__ == "__main__":
-    dataset_statistics(transform_type='no-crop', img_name='no_crop_images')
+    dataset_statistics()
