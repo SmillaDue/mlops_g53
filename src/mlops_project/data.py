@@ -2,25 +2,11 @@ import os
 from pathlib import Path
 
 import torch
-from monai.transforms import Compose, EnsureChannelFirst, Resize, ToTensor
-from PIL import Image
 
-from mlops_project.utils import CropImage, LoadImageFromCV, NormalizeImage, ToGrayCHW
+from mlops_project.utils import ArrayPreprocessing, TensorsPreprocessing
 
 # hyperparameter
 IMG_SIZE = 256
-
-data_transforms = Compose(
-    [
-        LoadImageFromCV(),
-        CropImage(),
-        ToTensor(),
-        EnsureChannelFirst(channel_dim=-1),
-        ToGrayCHW(),
-        Resize((IMG_SIZE, IMG_SIZE)),
-        NormalizeImage(),
-    ]
-)
 
 #### Load training data ######
 def load_data(raw_data_dir: str):
@@ -61,18 +47,14 @@ def load_data(raw_data_dir: str):
         image_class.extend([i] * num_each[i])
     num_total = len(image_class)
 
-    # Get image dimensions from first image, the images are processed to be of same size
-    image_width, image_height = Image.open(image_files_list[0]).size
-
     # Create training datasets
     train_x = [image_files_list[i] for i in range(num_total)]
     train_y = [image_class[i] for i in range(num_total)]
-
     print(f"Training data loaded from {train_data_dir}")
     print(f"Total image count: {num_total}")
-    print(f"Image dimensions: {image_width} x {image_height}")
     print(f"Label names: {class_names}")
     print(f"Label counts: {num_each}")
+    print('')
 
     # Get sorted list of class directories
     test_class_names = sorted(x for x in os.listdir(test_data_dir) if os.path.isdir(os.path.join(test_data_dir, x)))
@@ -93,12 +75,9 @@ def load_data(raw_data_dir: str):
         test_image_files_list.extend(test_image_files[i])
         test_image_class.extend([i] * num_test_each[i])
     num_test_total = len(test_image_class)
-    # Get image dimensions from first test image
-    test_image_width, test_image_height = Image.open(test_image_files_list[0]).size
 
     print(f"Testing data loaded from {test_data_dir}")
     print(f"Total test image count: {num_test_total}")
-    print(f"Test image dimensions: {test_image_width} x {test_image_height}")
     print(f"Test label names: {test_class_names}")
     print(f"Test label counts: {num_test_each}")
 
@@ -126,33 +105,30 @@ def preprocess_data(raw_data_dir: str, processed_data_dir: str):
     
     # TRAINING DATA
     # ### PREPROCESSING
-    processed_x, processed_y = [], []
-    for path_str, label in zip(train_x, train_y):
-        processed_img = data_transforms(path_str)  # (1,H, W)
-        processed_img = processed_img.float()
-        processed_x.append(processed_img)
-        processed_y.append(label)
+    array_preprocessing = ArrayPreprocessing(img_size=IMG_SIZE)
+    tensor_preprocessing = TensorsPreprocessing()
+    
+    imgs = [array_preprocessing(img_path) for img_path in train_x]  # list of tensors (1,H,W)
+    imgs = tensor_preprocessing(imgs)
 
-    X = torch.stack(processed_x, dim=0)  # (N,1,H,W)
-    y = torch.tensor(processed_y, dtype=torch.long)  # (N,), long
+    X_train = imgs
+    y_train = torch.tensor(train_y, dtype=torch.long)  # (N,), long
 
     out_dir = Path(processed_data_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    torch.save(X, out_dir / "train_images.pt")
-    torch.save(y, out_dir / "train_targets.pt")
+    torch.save(X_train, out_dir / "train_images.pt")
+    torch.save(y_train, out_dir / "train_targets.pt")
 
     # TESTING DATA
-    processed_test_x, processed_test_y = [], []
-    for path_str, label in zip(test_x, test_y):
-        img_path = Path(path_str)
-        processed_img = data_transforms(img_path)  # (1,H, W)
-        processed_img = processed_img.float()
+    # ### PREPROCESSING
+    array_preprocessing = ArrayPreprocessing(img_size=IMG_SIZE)
+    tensor_preprocessing = TensorsPreprocessing()
+    
+    imgs = [array_preprocessing(img_path) for img_path in test_x]  # list of tensors (1,H,W)
+    imgs = tensor_preprocessing(imgs)
 
-        processed_test_x.append(processed_img)
-        processed_test_y.append(label)
-
-    X_test = torch.stack(processed_test_x, dim=0)  # (N,1,H,W)
-    y_test = torch.tensor(processed_test_y, dtype=torch.long)  # (N,), long
+    X_test = imgs
+    y_test = torch.tensor(test_y, dtype=torch.long)  # (N,), long
 
     torch.save(X_test, out_dir / "test_images.pt")
     torch.save(y_test, out_dir / "test_targets.pt")
@@ -173,7 +149,6 @@ def brain_tumor() -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
     train_set = torch.utils.data.TensorDataset(train_images, train_target)
     test_set = torch.utils.data.TensorDataset(test_images, test_target)
     return train_set, test_set
-
 
 if __name__ == "__main__":
     preprocess_data("data/raw", "data/processed")
