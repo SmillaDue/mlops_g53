@@ -32,7 +32,11 @@ jobs:
         run: |
           uv sync --dev --locked
 
-      - name: Run tests & coverage
+      - name: Run unit tests with coverage
         run: |
-          uv run coverage run -m pytest tests/
-          uv run coverage report -m
+          uv run coverage run -m pytest tests/unittests
+          uv run coverage report -m > reports/coverage_report.out
+
+      - name: Run integration tests
+        run: |
+          uv run pytest tests/integrationtests
