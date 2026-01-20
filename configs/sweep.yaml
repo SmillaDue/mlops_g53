@@ -1,7 +1,7 @@
 program: src/mlops_project/train.py
-name: hyperparameter-sweep-smallcnn
+name: hyperparameter-sweep-densenet
 entity: brainy_mlops
-project: smallcnn
+project: densenet
 method: bayes
 metric:
   name: val/loss_epoch
@@ -16,18 +16,18 @@ command:
   - ${args_no_hyphens}
 parameters:
   model:
-    value: smallcnn
+    value: densenet
   batch_size:
     values: [16, 32, 64]
   epochs:
-    value: 3
+    value: 10
   optimizer.lr:
     min: 0.0001
     max: 0.01
     distribution: log_uniform_values
   optimizer.weight_decay:
-    values: [0, 0.0001, 0.001]
+    values: [0.001]
   optimizer.name:
-    values: [Adam, AdamW]
+    values: [AdamW]
   wandb.enabled:
     value: true

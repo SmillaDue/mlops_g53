@@ -1,0 +1,16 @@
+wandb_version: 1
+
+batch_size:
+  value: 64
+epochs:
+  value: 3
+model:
+  value: smallcnn
+optimizer.lr:
+  value: 0.0027480045062145938
+optimizer.name:
+  value: Adam
+optimizer.weight_decay:
+  value: 0.001
+wandb.enabled:
+  value: true
