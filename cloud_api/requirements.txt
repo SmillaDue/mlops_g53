@@ -1,0 +1,11 @@
+fastapi==0.115.6
+functions-framework==3.10.0
+uvicorn[standard]==0.34.0
+python-multipart==0.0.9
+pillow==12.1.0
+monai==1.5.1
+google-cloud-storage
+
+torch==2.6.0
+torchvision==0.21.0
+
