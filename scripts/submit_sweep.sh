@@ -46,13 +46,14 @@ workerPoolSpecs:
           mkdir -p /data/processed
           gcloud storage cp -r gs://mlops-brain-tumor/data/processed/v1/* /data/processed/
           echo "Data downloaded successfully"
+          ls -la /data/processed/
           echo "Starting wandb agent..."
           uv run wandb agent brainy_mlops/smallcnn/$SWEEP_ID --count $COUNT
       env:
         - name: PYTHONUNBUFFERED
           value: "1"
-        - name: GCS_DATA_URI
-          value: gs://mlops-brain-tumor/data/processed/v1
+        - name: DATA_DIR
+          value: "/data/processed"
         - name: WANDB_API_KEY
           value: "$WANDB_KEY"
 EOF
