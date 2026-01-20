@@ -9,4 +9,4 @@ optimizer:
     lr: 0.001
     weight_decay: 0
 
-print_every: 10
+print_every: 100
