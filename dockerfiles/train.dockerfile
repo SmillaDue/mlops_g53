@@ -9,25 +9,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-    
-
 COPY uv.lock uv.lock
 COPY pyproject.toml pyproject.toml
 COPY src/ src/
-COPY data/ data/
 COPY README.md README.md
 COPY LICENSE LICENSE
 COPY models/ models/
 COPY reports/ reports/
 COPY configs/ configs/
 
-
 WORKDIR /
 ENV UV_LINK_MODE=copy
-RUN --mount=type=cache,target=/root/.cache/uv uv sync
+RUN --mount=type=cache,target=/root/.cache/uv uv sync\
 
 COPY scripts/entrypoint_train.sh /entrypoint_train.sh
 RUN chmod +x /entrypoint_train.sh
 ENTRYPOINT ["/entrypoint_train.sh"]
-
-#ENTRYPOINT ["uv", "run", "src/mlops_project/train.py"]
+# ENTRYPOINT ["uv", "run", "src/mlops_project/train.py"]

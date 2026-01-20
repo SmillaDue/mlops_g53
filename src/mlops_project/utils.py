@@ -7,6 +7,7 @@ import numpy as np
 import torch
 from monai.transforms import ScaleIntensity
 
+
 def show_image_and_target(images, targets, show=True):
     """Display images with their corresponding targets in a single grid."""
 
@@ -35,6 +36,7 @@ def show_image_and_target(images, targets, show=True):
 
     if show:
         plt.show()
+
 
 def crop_img(img: np.ndarray) -> np.ndarray:
     """Crop image to remove black borders using contour detection.
@@ -73,42 +75,44 @@ def crop_img(img: np.ndarray) -> np.ndarray:
 
     return new_img
 
-class ArrayPreprocessing():
-    def __init__(self, img_size, crop_img = True):
+
+class ArrayPreprocessing:
+    def __init__(self, img_size, crop_img=True):
         self.img_size = img_size
         self.crop_img = crop_img
-    
+
     def __call__(self, img_path):
         img = self.load(img_path)
-        
+
         if self.crop_img == True:
             img = self.crop(img)
-            
+
         img = self.gray_scale(img)
         img = self.resize(img)
-        img = img[:,:,None] #shape (1,H,W)
+        img = img[:, :, None]  # shape (1,H,W)
         return img
-        
+
     def load(self, img_path):
         return cv2.imread(str(img_path))
-    
+
     def crop(self, img):
         return crop_img(img)
-    
+
     def gray_scale(self, img):
         return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    
+
     def resize(self, img):
         return cv2.resize(img, (self.img_size, self.img_size))
-    
-class TensorsPreprocessing():
+
+
+class TensorsPreprocessing:
     def __call__(self, imgs):
         # If a single image is passed as (H, W, C), wrap it
         if isinstance(imgs, np.ndarray) and imgs.ndim == 3:
             imgs = [imgs]
-        
+
         imgs = np.stack(imgs, axis=0)
         imgs = torch.from_numpy(imgs).float() / 255.0
-        imgs = imgs.permute(0, 3, 1, 2) 
+        imgs = imgs.permute(0, 3, 1, 2)
         imgs = (imgs - imgs.mean()) / (imgs.std())
         return imgs

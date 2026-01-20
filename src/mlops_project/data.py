@@ -8,6 +8,7 @@ from mlops_project.utils import ArrayPreprocessing, TensorsPreprocessing
 # hyperparameter
 IMG_SIZE = 256
 
+
 #### Load training data ######
 def load_data(raw_data_dir: str):
     """Load training and testing data from raw data directory.
@@ -54,7 +55,7 @@ def load_data(raw_data_dir: str):
     print(f"Total image count: {num_total}")
     print(f"Label names: {class_names}")
     print(f"Label counts: {num_each}")
-    print('')
+    print("")
 
     # Get sorted list of class directories
     test_class_names = sorted(x for x in os.listdir(test_data_dir) if os.path.isdir(os.path.join(test_data_dir, x)))
@@ -102,12 +103,12 @@ def preprocess_data(raw_data_dir: str, processed_data_dir: str):
 
     #### Load training data ######
     train_x, train_y, test_x, test_y, class_names = load_data(raw_data_dir)  # lists containing file paths and labels
-    
+
     # TRAINING DATA
     # ### PREPROCESSING
     array_preprocessing = ArrayPreprocessing(img_size=IMG_SIZE)
     tensor_preprocessing = TensorsPreprocessing()
-    
+
     imgs = [array_preprocessing(img_path) for img_path in train_x]  # list of tensors (1,H,W)
     imgs = tensor_preprocessing(imgs)
 
@@ -123,7 +124,7 @@ def preprocess_data(raw_data_dir: str, processed_data_dir: str):
     # ### PREPROCESSING
     array_preprocessing = ArrayPreprocessing(img_size=IMG_SIZE)
     tensor_preprocessing = TensorsPreprocessing()
-    
+
     imgs = [array_preprocessing(img_path) for img_path in test_x]  # list of tensors (1,H,W)
     imgs = tensor_preprocessing(imgs)
 
@@ -140,15 +141,16 @@ def preprocess_data(raw_data_dir: str, processed_data_dir: str):
 def brain_tumor() -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
     """Return train and test datasets for corrupt MNIST."""
     base_dir = Path(os.environ.get("DATA_DIR", "data/processed"))
-    
+
     train_images = torch.load(base_dir / "train_images.pt", weights_only=False)
     train_target = torch.load(base_dir / "train_targets.pt", weights_only=False)
-    test_images  = torch.load(base_dir / "test_images.pt", weights_only=False)
-    test_target  = torch.load(base_dir / "test_targets.pt", weights_only=False)
+    test_images = torch.load(base_dir / "test_images.pt", weights_only=False)
+    test_target = torch.load(base_dir / "test_targets.pt", weights_only=False)
 
     train_set = torch.utils.data.TensorDataset(train_images, train_target)
     test_set = torch.utils.data.TensorDataset(test_images, test_target)
     return train_set, test_set
+
 
 if __name__ == "__main__":
     preprocess_data("data/raw", "data/processed")

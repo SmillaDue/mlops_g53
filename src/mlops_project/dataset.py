@@ -1,15 +1,16 @@
 import os
+from typing import Literal
 
 import matplotlib.pyplot as plt
 import monai
 import torch
 from torch import Tensor
 from torch.utils.data import Dataset
-from typing import Literal
 
 from mlops_project.utils import ArrayPreprocessing, TensorsPreprocessing, show_image_and_target
 
 IMG_SIZE = 256
+
 
 class BrainTumorDataset(Dataset):
     """Brain tumor dataset for PyTorch.
@@ -26,8 +27,8 @@ class BrainTumorDataset(Dataset):
         self,
         data_folder: str = "data/raw",
         train: bool = True,
-        img_preprocess = ArrayPreprocessing(img_size=IMG_SIZE, crop_img=True),
-        img_transforms = TensorsPreprocessing(),
+        img_preprocess=ArrayPreprocessing(img_size=IMG_SIZE, crop_img=True),
+        img_transforms=TensorsPreprocessing(),
         target_transform: monai.transforms.Transform | None = None,
     ) -> None:
         super().__init__()
@@ -63,7 +64,7 @@ class BrainTumorDataset(Dataset):
 
         X = imgs
         y = torch.tensor(target, dtype=torch.long)  # (N,), long
-        
+
         self.images = X
         self.target = y
 
@@ -76,13 +77,14 @@ class BrainTumorDataset(Dataset):
         """Return the number of images in the dataset."""
         return self.images.shape[0]
 
+
 def dataset_statistics(
     IMG_SIZE: int = 256,
-    transform_type: Literal['crop', 'no-crop'] = 'crop',
+    transform_type: Literal["crop", "no-crop"] = "crop",
     datadir: str = "data/raw",
     seed: int | None = 37,
-    img_name: str = 'cropped_images',
-    plot: bool = True
+    img_name: str = "cropped_images",
+    plot: bool = True,
 ) -> None:
     """
     Compute dataset statistics.
@@ -99,11 +101,11 @@ seed: {seed}
     if seed is not None:
         torch.manual_seed(seed)
 
-    if transform_type == 'crop':
+    if transform_type == "crop":
         array_preprocessing = ArrayPreprocessing(img_size=IMG_SIZE, crop_img=True)
     else:
         array_preprocessing = ArrayPreprocessing(img_size=IMG_SIZE, crop_img=False)
-        
+
     train_dataset = BrainTumorDataset(data_folder=datadir, train=True, img_preprocess=array_preprocessing)
     test_dataset = BrainTumorDataset(data_folder=datadir, train=False)
 
@@ -140,7 +142,7 @@ seed: {seed}
 
     train_label_distribution = torch.bincount(train_dataset.target)
     test_label_distribution = torch.bincount(test_dataset.target)
-    
+
     train_label_counts = {i: count.item() for i, count in enumerate(train_label_distribution)}
     test_label_counts = {i: count.item() for i, count in enumerate(test_label_distribution)}
 
@@ -157,8 +159,9 @@ seed: {seed}
     plt.ylabel("Count")
     plt.savefig("reports/figures/dataset/test_label_distribution.png")
     plt.close()
-    
+
     return train_label_counts, test_label_counts
+
 
 if __name__ == "__main__":
     dataset_statistics()

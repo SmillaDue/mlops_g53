@@ -39,6 +39,7 @@ def test_loading_of_processed_data(img_size: int = 256):
                 and 0 <= sample_label.item() < 4
             ), f"Expected label to be a 1-element tensor, dtype int and value < 4, got {sample_label} ({type(sample_label)}), at index {i}"
 
+
 def test_data_processing():
     raw_data_dir = "data/raw"
     train_x, train_y, test_x, test_y, label_names = load_data(raw_data_dir)
@@ -53,7 +54,7 @@ def test_data_processing():
 
     assert all(isinstance(path, str) for path in train_x), "All training image paths should be strings"
     assert all(isinstance(path, str) for path in test_x), "All testing image paths should be strings"
-    
+
     for path in train_x + test_x:
         assert os.path.isfile(path), f"Image file does not exist: {path}"
         try:
@@ -61,8 +62,9 @@ def test_data_processing():
                 img.verify()  # Verify that it is, in fact, an image
         except (IOError, SyntaxError) as e:
             pytest.fail(f"Invalid image file: {path}, error: {e}")
-            
-def test_counts_match_filesystem(raw_dir = "data/raw"):
+
+
+def test_counts_match_filesystem(raw_dir="data/raw"):
     raw = Path(raw_dir)
     train_root = raw / "Training"
     test_root = raw / "Testing"
@@ -70,18 +72,12 @@ def test_counts_match_filesystem(raw_dir = "data/raw"):
     train_x, train_y, test_x, test_y, class_names = load_data(raw_dir)
 
     # Expected counts from filesystem (by class folder name)
-    expected_train_counts = {
-        cls: len([f for f in (train_root / cls).iterdir() if f.is_file()])
-        for cls in class_names
-    }
-    expected_test_counts = {
-        cls: len([f for f in (test_root / cls).iterdir() if f.is_file()])
-        for cls in class_names
-    }
+    expected_train_counts = {cls: len([f for f in (train_root / cls).iterdir() if f.is_file()]) for cls in class_names}
+    expected_test_counts = {cls: len([f for f in (test_root / cls).iterdir() if f.is_file()]) for cls in class_names}
 
     # Actual counts from returned labels (use folder name inferred from path)
     actual_train_counts = Counter(Path(p).parent.name for p in train_x)
     actual_test_counts = Counter(Path(p).parent.name for p in test_x)
-    
+
     assert actual_train_counts == expected_train_counts
     assert actual_test_counts == expected_test_counts

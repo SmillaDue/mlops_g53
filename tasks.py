@@ -30,7 +30,8 @@ def evaluate(ctx: Context, args: str = "") -> None:
     if args:
         cmd += f" {args}"
     ctx.run(cmd, echo=True, pty=not WINDOWS)
-    
+
+
 @task
 def api(ctx: Context, args: str = ""):
     """API for inference initialisation"""
