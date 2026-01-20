@@ -56,15 +56,18 @@ async def inference(
     data: UploadFile = File(...),
 ):
     """
-    Do inference by
-    1. uploading an image for inference
+    API does inference by
+    1. User uploads an image for inference
+    
+    Then the following is executed:
+    
     2. transform/preprocess the uploaded image
     3. load in a model
     4. predict
     5. return pct for each class? just the class? Depends on the intended user."""
 
     config = request.app.state.cfg
-    model_checkpoint = 'models/model.pth'
+    model_checkpoint = '/gcs/mlops-brain-tumor/models/model.pth'
     
     # Save uploaded file
     content = await data.read()

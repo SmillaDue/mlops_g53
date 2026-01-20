@@ -9,15 +9,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy only dependency metadata first (better Docker layer caching)
-COPY uv.lock pyproject.toml README.md LICENSE ./ 
+WORKDIR /
+COPY uv.lock pyproject.toml README.md LICENSE tasks.py ./ 
 
 # Copy application code
-COPY src/ src/
+COPY src/       src/
+COPY configs/   configs/
 
-# Run everything from a predictable project directory inside the container
-WORKDIR /app
-ENV UV_LINK_MODE=copy
-RUN --mount=type=cache,target=/root/.cache/uv uv sync
-
-# Start the API via invoke
+EXPOSE 8080
 ENTRYPOINT ["uvx", "invoke", "api"]
