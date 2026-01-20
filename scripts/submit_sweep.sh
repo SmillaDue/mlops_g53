@@ -34,7 +34,9 @@ baseOutputDirectory:
 
 workerPoolSpecs:
   - machineSpec:
-      machineType: n1-standard-4
+      machineType: n1-standard-2
+      acceleratorType: NVIDIA_TESLA_T4
+      acceleratorCount: 1
     replicaCount: 1
     containerSpec:
       imageUri: europe-west1-docker.pkg.dev/mlops-g53/mlops-g53-repo/wandb:latest
