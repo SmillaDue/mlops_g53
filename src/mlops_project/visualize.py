@@ -4,7 +4,6 @@ import torch
 from omegaconf import DictConfig
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
-
 from wandb import config
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")

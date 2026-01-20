@@ -2,10 +2,10 @@ from pathlib import Path
 
 import hydra
 import torch
+import wandb
 from omegaconf import DictConfig, OmegaConf
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
-import wandb
 from mlops_project.data import brain_tumor
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
