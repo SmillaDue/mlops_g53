@@ -1,13 +1,14 @@
+import os
+from pathlib import Path
+
 import hydra
-import matplotlib.pyplot as plt
 import matplotlib
+import matplotlib.pyplot as plt
 import torch
+from google.cloud import storage
 from omegaconf import DictConfig
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
-from pathlib import Path
-import os
-from google.cloud import storage
 
 from wandb import config
 
@@ -21,8 +22,9 @@ MODEL_OBJECT = "models/model.pth"
 MODEL_PREFIX = "models/model.pth"
 DATA_PREFIX = "data"  # folder in the bucket
 
-LOCAL_DATA = Path(DATA_PREFIX) / 'processed'
+LOCAL_DATA = Path(DATA_PREFIX) / "processed"
 LOCAL_MODEL = Path(MODEL_PREFIX)
+
 
 def ensure_data():
     client = storage.Client()
@@ -50,10 +52,11 @@ def ensure_data():
 
         blob.download_to_filename(str(local_path))
 
+
 ensure_data()
 
 
-@hydra.main(config_path='../../configs', config_name="default_config.yaml", version_base=None)
+@hydra.main(config_path="../../configs", config_name="default_config.yaml", version_base=None)
 def visualize(config: DictConfig) -> None:
     """Visualize model predictions."""
     figure_name: str = "embeddings.png"
