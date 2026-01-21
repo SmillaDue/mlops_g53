@@ -32,6 +32,12 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.ba
 
 
 def ensure_model():
+    """
+    Ensure that the trained model weights exist locally.
+
+    If the model file is not present at LOCAL_MODEL, it is downloaded
+    from the configured Google Cloud Storage bucket.
+    """
     if LOCAL_MODEL.exists():
         return
 
@@ -43,6 +49,15 @@ def ensure_model():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """
+    Application lifecycle hook.
+
+    - Clears any existing Hydra state (important for reloads/tests).
+    - Loads the Hydra configuration.
+    - Ensures the trained model is available locally.
+    - Stores the configuration on `app.state` for later use.
+    """
+    
     # Important if the app reloads (uvicorn --reload) or tests import multiple times
     GlobalHydra.instance().clear()
 
@@ -61,12 +76,25 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
 def read_root():
-    """Health check."""
-    response = {
-        "message": "Welcome to the model inference API!",
-        "status-code": 200,
+    """
+    Root endpoint and health check.
+
+    Returns a short description of the service and how to use it.
+    """
+    return {
+        "service": "Model Inference API",
+        "status": "ok",
+        "description": (
+            "This API performs image classification using a trained PyTorch model.\n\n"
+            "Usage:\n"
+            "POST /inference/\n"
+            "  - multipart/form-data with a single file field named `data`\n"
+            "  - the file must be an image\n\n"
+            "The response contains the model's class probabilities.\n"
+            "You can also retrieve the preprocessed image at:\n"
+            "GET /inference/image_preprocessed.png"
+        ),
     }
-    return response
 
 
 @app.post("/inference/")
@@ -83,7 +111,8 @@ async def inference(
     2. transform/preprocess the uploaded image
     3. load in a model
     4. predict
-    5. return pct for each class? just the class? Depends on the intended user."""
+    5. return pct for each class? just the class? Depends on the intended user.
+    """
 
     config = request.app.state.cfg
 
@@ -125,6 +154,11 @@ async def inference(
 
 @app.get("/inference/image_preprocessed.png")
 def get_preprocessed_image():
+    """
+    Retrieve the most recently preprocessed image produced by the
+    `/inference/` endpoint.
+    """    
+
     path = Path("image_preprocessed.png")
 
     if not path.exists():
