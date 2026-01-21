@@ -301,9 +301,13 @@ During training, step-level, epoch-level, and final performance metrics are logg
 > *As seen in the second image we are also tracking ... and ...*
 >
 > Answer:
-> ![Example Sweep](../figures/sweep.png)
+> In the first image you could see an overview of the sweep. Here it is a very basic one mainly observing the batch size and learning rate.
+> ![Example Sweep](/reports/figures/sweep.png )
+> In the next picutre you can see that we also track the loss value of our training. This one is for our best sweep run from above.
+>![Example Sweep](/reports/figures/loss.png )
+> In the last figure, we report the model’s accuracy on the test dataset using the best-performing sweep configuration.
+> ![Example Sweep](/reports/figures/accuracy.png )
 
---- question 14 fill here ---
 
 ### Question 15
 
