@@ -1,71 +1,12 @@
 import os
 from pathlib import Path
 
-import cv2
-import imutils
-import numpy as np
 import torch
-from monai.transforms import Compose, EnsureChannelFirst, RandFlip, RandRotate, RandZoom, Resize, ToTensor, Transform
-from PIL import Image
+
+from mlops_project.utils import ArrayPreprocessing, TensorsPreprocessing
 
 # hyperparameter
 IMG_SIZE = 256
-
-
-def normalize(images: torch.Tensor) -> torch.Tensor:
-    """Normalize images."""
-    return (images - images.mean()) / images.std()
-
-
-def crop_img(img: np.ndarray) -> np.ndarray:
-    """Crop image to remove black borders using contour detection.
-
-    Finds the extreme points on the image and crops the rectangular out of them.
-
-    Args:
-        img: Input image as numpy array in RGB format.
-
-    Returns:
-        Cropped image as numpy array.
-    """
-    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    gray = cv2.GaussianBlur(gray, (3, 3), 0)
-
-    # threshold the image, then perform a series of erosions +
-    # dilations to remove any small regions of noise
-    thresh = cv2.threshold(gray, 45, 255, cv2.THRESH_BINARY)[1]
-    thresh = cv2.erode(thresh, None, iterations=2)
-    thresh = cv2.dilate(thresh, None, iterations=2)
-
-    # find contours in thresholded image, then grab the largest one
-    cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    cnts = imutils.grab_contours(cnts)
-    c = max(cnts, key=cv2.contourArea)
-
-    # find the extreme points
-    extLeft = tuple(c[c[:, :, 0].argmin()][0])
-    extRight = tuple(c[c[:, :, 0].argmax()][0])
-    extTop = tuple(c[c[:, :, 1].argmin()][0])
-    extBot = tuple(c[c[:, :, 1].argmax()][0])
-    ADD_PIXELS = 0
-    new_img = img[
-        extTop[1] - ADD_PIXELS : extBot[1] + ADD_PIXELS, extLeft[0] - ADD_PIXELS : extRight[0] + ADD_PIXELS
-    ].copy()
-
-    return new_img
-
-
-data_transforms = Compose(
-    [
-        lambda img: cv2.imread(str(img)),
-        crop_img,
-        lambda img: cv2.cvtColor(img, cv2.COLOR_RGB2GRAY),
-        lambda img: img[None, ...],  # Add channel dimension: (H, W) -> (1, H, W)
-        ToTensor(),
-        Resize((IMG_SIZE, IMG_SIZE)),
-        normalize,
-    ]
-)
 
 
 #### Load training data ######
@@ -107,18 +48,14 @@ def load_data(raw_data_dir: str):
         image_class.extend([i] * num_each[i])
     num_total = len(image_class)
 
-    # Get image dimensions from first image, the images are processed to be of same size
-    image_width, image_height = Image.open(image_files_list[0]).size
-
     # Create training datasets
     train_x = [image_files_list[i] for i in range(num_total)]
     train_y = [image_class[i] for i in range(num_total)]
-
     print(f"Training data loaded from {train_data_dir}")
     print(f"Total image count: {num_total}")
-    print(f"Image dimensions: {image_width} x {image_height}")
     print(f"Label names: {class_names}")
     print(f"Label counts: {num_each}")
+    print("")
 
     # Get sorted list of class directories
     test_class_names = sorted(x for x in os.listdir(test_data_dir) if os.path.isdir(os.path.join(test_data_dir, x)))
@@ -139,12 +76,9 @@ def load_data(raw_data_dir: str):
         test_image_files_list.extend(test_image_files[i])
         test_image_class.extend([i] * num_test_each[i])
     num_test_total = len(test_image_class)
-    # Get image dimensions from first test image
-    test_image_width, test_image_height = Image.open(test_image_files_list[0]).size
 
     print(f"Testing data loaded from {test_data_dir}")
     print(f"Total test image count: {num_test_total}")
-    print(f"Test image dimensions: {test_image_width} x {test_image_height}")
     print(f"Test label names: {test_class_names}")
     print(f"Test label counts: {num_test_each}")
 
@@ -172,33 +106,30 @@ def preprocess_data(raw_data_dir: str, processed_data_dir: str):
 
     # TRAINING DATA
     # ### PREPROCESSING
-    processed_x, processed_y = [], []
-    for path_str, label in zip(train_x, train_y):
-        processed_img = data_transforms(path_str)  # (1,H, W)
-        processed_img = processed_img.float()
-        processed_x.append(processed_img)
-        processed_y.append(label)
+    array_preprocessing = ArrayPreprocessing(img_size=IMG_SIZE)
+    tensor_preprocessing = TensorsPreprocessing()
 
-    X = torch.stack(processed_x, dim=0)  # (N,1,H,W)
-    y = torch.tensor(processed_y, dtype=torch.long)  # (N,), long
+    imgs = [array_preprocessing(img_path) for img_path in train_x]  # list of tensors (1,H,W)
+    imgs = tensor_preprocessing(imgs)
+
+    X_train = imgs
+    y_train = torch.tensor(train_y, dtype=torch.long)  # (N,), long
 
     out_dir = Path(processed_data_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    torch.save(X, out_dir / "train_images.pt")
-    torch.save(y, out_dir / "train_targets.pt")
+    torch.save(X_train, out_dir / "train_images.pt")
+    torch.save(y_train, out_dir / "train_targets.pt")
 
     # TESTING DATA
-    processed_test_x, processed_test_y = [], []
-    for path_str, label in zip(test_x, test_y):
-        img_path = Path(path_str)
-        processed_img = data_transforms(img_path)  # (1,H, W)
-        processed_img = processed_img.float()
+    # ### PREPROCESSING
+    array_preprocessing = ArrayPreprocessing(img_size=IMG_SIZE)
+    tensor_preprocessing = TensorsPreprocessing()
 
-        processed_test_x.append(processed_img)
-        processed_test_y.append(label)
+    imgs = [array_preprocessing(img_path) for img_path in test_x]  # list of tensors (1,H,W)
+    imgs = tensor_preprocessing(imgs)
 
-    X_test = torch.stack(processed_test_x, dim=0)  # (N,1,H,W)
-    y_test = torch.tensor(processed_test_y, dtype=torch.long)  # (N,), long
+    X_test = imgs
+    y_test = torch.tensor(test_y, dtype=torch.long)  # (N,), long
 
     torch.save(X_test, out_dir / "test_images.pt")
     torch.save(y_test, out_dir / "test_targets.pt")

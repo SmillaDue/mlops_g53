@@ -4,52 +4,12 @@ from typing import Literal
 import matplotlib.pyplot as plt
 import monai
 import torch
-from monai.transforms import (
-    Compose,
-    EnsureChannelFirst,
-    LoadImage,
-    RandFlip,
-    RandRotate,
-    RandZoom,
-    Resize,
-    ScaleIntensity,
-    ToTensor,
-)
 from torch import Tensor
 from torch.utils.data import Dataset
 
-from mlops_project.utils import (
-    CropImage,
-    LoadImageFromCV,
-    NormalizeImage,
-    ToGrayCHW,
-    describe_compose,
-    show_image_and_target,
-)
+from mlops_project.utils import ArrayPreprocessing, TensorsPreprocessing, show_image_and_target
 
 IMG_SIZE = 256
-data_transforms = Compose(
-    [
-        LoadImageFromCV(),
-        CropImage(),
-        ToTensor(),
-        EnsureChannelFirst(channel_dim=-1),
-        ToGrayCHW(),
-        Resize((IMG_SIZE, IMG_SIZE)),
-        NormalizeImage(),
-        ScaleIntensity(),
-    ]
-)
-
-data_transforms_simple = Compose(
-    [
-        LoadImage(image_only=True),
-        EnsureChannelFirst(channel_dim=-1),
-        ToGrayCHW(),
-        Resize((IMG_SIZE, IMG_SIZE)),
-        ScaleIntensity(),
-    ]
-)
 
 
 class BrainTumorDataset(Dataset):
@@ -67,13 +27,15 @@ class BrainTumorDataset(Dataset):
         self,
         data_folder: str = "data/raw",
         train: bool = True,
-        img_transform: monai.transforms.Transform | None = data_transforms,
+        img_preprocess=ArrayPreprocessing(img_size=IMG_SIZE, crop_img=True),
+        img_transforms=TensorsPreprocessing(),
         target_transform: monai.transforms.Transform | None = None,
     ) -> None:
         super().__init__()
         self.data_folder = data_folder
         self.train = train
-        self.img_transform = img_transform
+        self.img_preprocess = img_preprocess
+        self.img_transforms = img_transforms
         self.target_transform = target_transform
         self.load_data()
 
@@ -85,30 +47,30 @@ class BrainTumorDataset(Dataset):
         else:
             data_folder = os.path.join(self.data_folder, "Testing")
 
-        images, target = [], []
-        for i, folder in enumerate(os.listdir(data_folder)):
+        img_paths, target = [], []
+        for i, folder in enumerate(sorted(os.listdir(data_folder))):
             class_folder_path = os.path.join(data_folder, folder)
             if os.path.isdir(class_folder_path):
-                nb_files = [
-                    f for f in os.listdir(class_folder_path) if os.path.isfile(os.path.join(class_folder_path, f))
+                files = [
+                    os.path.join(class_folder_path, f)
+                    for f in os.listdir(class_folder_path)
+                    if os.path.isfile(os.path.join(class_folder_path, f))
                 ]
-                for file_path in nb_files:
-                    img_path = os.path.join(class_folder_path, file_path)
-                    images.append(self.img_transform(str(img_path)).float())
-                    target.append(i)
+                img_paths += files
+                target += [i] * len(files)
 
-        X = torch.stack(images, dim=0)  # (N,3,H,W) or (N,1,H,W)
+        imgs = [self.img_preprocess(p) for p in img_paths]  # list of tensors (1,H,W)
+        imgs = self.img_transforms(imgs)
+
+        X = imgs
         y = torch.tensor(target, dtype=torch.long)  # (N,), long
+
         self.images = X
         self.target = y
 
     def __getitem__(self, idx: int) -> tuple[Tensor, Tensor]:
         """Return image and target tensor. Transforms are applied when loading data."""
         img, target = self.images[idx], self.target[idx]
-        # if self.img_transform:
-        #     img = self.img_transform(img)
-        # if self.target_transform:
-        #     target = self.target_transform(target)
         return img, target
 
     def __len__(self) -> int:
@@ -117,10 +79,12 @@ class BrainTumorDataset(Dataset):
 
 
 def dataset_statistics(
-    transform_type: Literal["simple", "crop"] = "simple",
     IMG_SIZE: int = 256,
+    transform_type: Literal["crop", "no-crop"] = "crop",
     datadir: str = "data/raw",
     seed: int | None = 37,
+    img_name: str = "cropped_images",
+    plot: bool = True,
 ) -> None:
     """
     Compute dataset statistics.
@@ -131,20 +95,19 @@ def dataset_statistics(
 Parameters:
 IMG_SIZE: {IMG_SIZE}
 seed: {seed}
-transform_type: {transform_type}
-datatransforms: \n{describe_compose(data_transforms) if transform_type == "crop" else describe_compose(data_transforms_simple)}
         """
     print(info)
 
     if seed is not None:
         torch.manual_seed(seed)
 
-    if transform_type == "simple":
-        train_dataset = BrainTumorDataset(data_folder=datadir, train=True, img_transform=data_transforms_simple)
-        test_dataset = BrainTumorDataset(data_folder=datadir, train=False, img_transform=data_transforms_simple)
+    if transform_type == "crop":
+        array_preprocessing = ArrayPreprocessing(img_size=IMG_SIZE, crop_img=True)
     else:
-        train_dataset = BrainTumorDataset(data_folder=datadir, train=True, img_transform=data_transforms)
-        test_dataset = BrainTumorDataset(data_folder=datadir, train=False, img_transform=data_transforms)
+        array_preprocessing = ArrayPreprocessing(img_size=IMG_SIZE, crop_img=False)
+
+    train_dataset = BrainTumorDataset(data_folder=datadir, train=True, img_preprocess=array_preprocessing)
+    test_dataset = BrainTumorDataset(data_folder=datadir, train=False)
 
     print(f"Train dataset: {train_dataset.name}")
     print(f"Number of images: {len(train_dataset)}")
@@ -154,42 +117,34 @@ datatransforms: \n{describe_compose(data_transforms) if transform_type == "crop"
     print(f"Number of images: {len(test_dataset)}")
     print(f"Image shape: {test_dataset[0][0].shape}")
 
-    n_total = train_dataset.images.shape[0]
-    N = min(25, n_total)
-    idx = torch.randperm(n_total)[:N]
+    if plot == True:
+        n_total = train_dataset.images.shape[0]
+        N = min(25, n_total)
+        idx = torch.randperm(n_total)[:N]
 
-    show_image_and_target(train_dataset.images[idx], train_dataset.target[idx], show=False)
+        show_image_and_target(train_dataset.images[idx], train_dataset.target[idx], show=False)
 
-    if transform_type == "simple":
         plt.suptitle("Random samples of images from training set", fontsize=18, y=0.96)
         plt.tight_layout(rect=[0, 0, 1, 0.95])
-        plt.savefig("reports/figures/dataset/braintumor_images_class_all.png")
-    else:
-        plt.suptitle("Random samples of processed images from training set", fontsize=18, y=0.96)
-        plt.tight_layout(rect=[0, 0, 1, 0.95])
-        plt.savefig("reports/figures/dataset/braintumor_images_processed_class_all.png")
-    plt.close()
+        plt.savefig(f"reports/figures/dataset/{img_name}_class_all.png")
+        plt.close()
 
-    for i in range(4):
-        indices = (train_dataset.target == i).nonzero(as_tuple=True)[0]
-        n_samples = min(25, len(indices))
-        selected_idx = indices[torch.randperm(len(indices))[:n_samples]]
+        for i in range(4):
+            indices = (train_dataset.target == i).nonzero(as_tuple=True)[0]
+            n_samples = min(25, len(indices))
+            selected_idx = indices[torch.randperm(len(indices))[:n_samples]]
 
-        show_image_and_target(train_dataset.images[selected_idx], selected_idx, show=False)
-
-        if transform_type == "simple":
+            show_image_and_target(train_dataset.images[selected_idx], selected_idx, show=False)
             plt.suptitle(f"Random samples of images from training set - class {i}", fontsize=18, y=0.96)
             plt.tight_layout(rect=[0, 0, 1, 0.95])
-            plt.savefig(f"reports/figures/dataset/braintumor_images_class_{i}.png")
-
-        else:
-            plt.suptitle(f"Random samples of processed images from training set - class {i}", fontsize=18, y=0.96)
-            plt.tight_layout(rect=[0, 0, 1, 0.95])
-            plt.savefig(f"reports/figures/dataset/braintumor_images_processed_class_{i}.png")
-        plt.close()
+            plt.savefig(f"reports/figures/dataset/{img_name}_class_{i}.png")
+            plt.close()
 
     train_label_distribution = torch.bincount(train_dataset.target)
     test_label_distribution = torch.bincount(test_dataset.target)
+
+    train_label_counts = {i: count.item() for i, count in enumerate(train_label_distribution)}
+    test_label_counts = {i: count.item() for i, count in enumerate(test_label_distribution)}
 
     plt.bar(torch.arange(4), train_label_distribution)
     plt.title("Train label distribution")
@@ -205,6 +160,8 @@ datatransforms: \n{describe_compose(data_transforms) if transform_type == "crop"
     plt.savefig("reports/figures/dataset/test_label_distribution.png")
     plt.close()
 
+    return train_label_counts, test_label_counts
+
 
 if __name__ == "__main__":
-    dataset_statistics(transform_type="crop")
+    dataset_statistics()
