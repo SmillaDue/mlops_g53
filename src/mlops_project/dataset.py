@@ -1,24 +1,25 @@
 import os
+import subprocess
 import sys
+from pathlib import Path
 from typing import Literal
 
 import matplotlib.pyplot as plt
 import monai
 import torch
+from google.cloud import storage
 from torch import Tensor
 from torch.utils.data import Dataset
-from pathlib import Path
-from google.cloud import storage
 
 from mlops_project.utils import ArrayPreprocessing, TensorsPreprocessing, show_image_and_target
 
-import subprocess
 subprocess.run(["dvc", "pull"], check=True)
 
 IS_LINUX = sys.platform.startswith("linux")
 if IS_LINUX:
     # Use a headless backend (no display required)
     import matplotlib
+
     matplotlib.use("Agg")
 
 IMG_SIZE = 256

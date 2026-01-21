@@ -1,4 +1,5 @@
 import os
+import subprocess
 from pathlib import Path
 
 import torch
@@ -6,14 +7,12 @@ from google.cloud import storage
 
 from mlops_project.utils import ArrayPreprocessing, TensorsPreprocessing
 
-import subprocess
 subprocess.run(["dvc", "pull"], check=True)
 
 # hyperparameter
 IMG_SIZE = 256
 
 BASE_DIR = Path(os.environ.get("DATA_DIR", "data/processed"))
-
 
 
 #### Load training data ######

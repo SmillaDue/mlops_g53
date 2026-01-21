@@ -11,7 +11,9 @@ from mlops_project.data import brain_tumor
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
 import subprocess
+
 subprocess.run(["dvc", "pull"], check=True)
+
 
 @hydra.main(config_path="../../configs", config_name="default_config.yaml", version_base=None)
 def train(config: DictConfig) -> None:
