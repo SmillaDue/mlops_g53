@@ -1,0 +1,111 @@
+_wandb:
+    value:
+        cli_version: 0.23.1
+        e:
+            2rblvanv09mm94d7oquhl6gt22nx4y25:
+                apple:
+                    ecpuCores: 4
+                    gpuCores: 16
+                    memoryGb: 24
+                    name: Apple M4 Pro
+                    pcpuCores: 8
+                    ramTotalBytes: "25769803776"
+                    swapTotalBytes: "5368709120"
+                args:
+                    - batch_size=16
+                    - epochs=10
+                    - model=densenet
+                    - optimizer.lr=0.00020091225575431936
+                    - optimizer.name=AdamW
+                    - optimizer.weight_decay=0.001
+                    - wandb.enabled=True
+                codePath: src/mlops_project/train.py
+                codePathLocal: src/mlops_project/train.py
+                cpu_count: 12
+                cpu_count_logical: 12
+                disk:
+                    /:
+                        total: "494384795648"
+                        used: "362997035008"
+                email: smilla.due@live.com
+                executable: /Users/smilladue/Desktop/Documents/DTU/ML-ops/mlops_g53/.venv/bin/python3
+                git:
+                    commit: c52210652dc58dcaee252b70016ad43b968a92b3
+                    remote: https://github.com/SmillaDue/mlops_g53.git
+                host: MacBook-Pro.local
+                memory:
+                    total: "25769803776"
+                os: macOS-15.7.2-arm64-arm-64bit-Mach-O
+                program: /Users/smilladue/Desktop/Documents/DTU/ML-ops/mlops_g53/src/mlops_project/train.py
+                python: CPython 3.13.7
+                root: /Users/smilladue/Desktop/Documents/DTU/ML-ops/mlops_g53
+                startedAt: "2026-01-20T14:37:55.950413Z"
+                writerId: 2rblvanv09mm94d7oquhl6gt22nx4y25
+        m: []
+        python_version: 3.13.7
+        t:
+            "1":
+                - 1
+                - 5
+                - 41
+                - 48
+                - 50
+                - 53
+            "2":
+                - 1
+                - 5
+                - 41
+                - 48
+                - 50
+                - 53
+            "3":
+                - 2
+                - 13
+                - 14
+                - 15
+                - 16
+                - 61
+            "4": 3.13.7
+            "5": 0.23.1
+            "12": 0.23.1
+            "13": darwin-arm64
+batch_size:
+    value: 16
+device:
+    value: mps
+epochs:
+    value: 10
+in_channels:
+    value: 1
+max_steps:
+    value: -1
+model:
+    value: densenet
+num_classes:
+    value: 4
+optimizer:
+    value:
+        lr: 0.00020091225575431936
+        name: AdamW
+        weight_decay: 0.001
+optimizer.lr:
+    value: 0.00020091225575431936
+optimizer.name:
+    value: AdamW
+optimizer.weight_decay:
+    value: 0.001
+print_every:
+    value: 50
+seed:
+    value: 42
+wandb:
+    value:
+        enabled: true
+        entity: brainy_mlops
+        log_every: 50
+        log_model: true
+        name: densenet_param_1
+        project: smallcnn
+        tags: []
+wandb.enabled:
+    value: true

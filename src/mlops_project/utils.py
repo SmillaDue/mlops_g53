@@ -89,7 +89,7 @@ class ArrayPreprocessing:
 
         img = self.gray_scale(img)
         img = self.resize(img)
-        img = img[:, :, None]  # shape (1,H,W)
+        img = img[:, :, None]  # shape (H,W,1)
         return img
 
     def load(self, img_path):
@@ -113,6 +113,6 @@ class TensorsPreprocessing:
 
         imgs = np.stack(imgs, axis=0)
         imgs = torch.from_numpy(imgs).float() / 255.0
-        imgs = imgs.permute(0, 3, 1, 2)
+        imgs = imgs.permute(0, 3, 1, 2) # (N, C, H, W)
         imgs = (imgs - imgs.mean()) / (imgs.std())
         return imgs

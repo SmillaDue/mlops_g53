@@ -1,0 +1,49 @@
+# Exclude large data files - data should be downloaded from GCS
+data/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Wandb local runs
+wandb/
+
+# Outputs
+outputs/
+models/*.pth
+
+# DVC
+.dvc/
+*.dvc
+
+# Misc
+.DS_Store
+*.log

@@ -1,0 +1,45 @@
+{
+  "os": "macOS-15.7.2-arm64-arm-64bit-Mach-O",
+  "python": "CPython 3.13.7",
+  "startedAt": "2026-01-20T10:05:23.558326Z",
+  "args": [
+    "batch_size=16",
+    "epochs=3",
+    "model=smallcnn",
+    "optimizer.lr=0.002087459813222168",
+    "optimizer.name=AdamW",
+    "optimizer.weight_decay=0.001",
+    "wandb.enabled=True"
+  ],
+  "program": "/Users/smilladue/Desktop/Documents/DTU/ML-ops/mlops_g53/src/mlops_project/train.py",
+  "codePath": "src/mlops_project/train.py",
+  "codePathLocal": "src/mlops_project/train.py",
+  "git": {
+    "remote": "https://github.com/SmillaDue/mlops_g53.git",
+    "commit": "26ca1ad1ece12e720cf1bce8b9622fe5cd7b946a"
+  },
+  "email": "smilla.due@live.com",
+  "root": "/Users/smilladue/Desktop/Documents/DTU/ML-ops/mlops_g53",
+  "host": "MacBook-Pro.local",
+  "executable": "/Users/smilladue/Desktop/Documents/DTU/ML-ops/mlops_g53/.venv/bin/python3",
+  "cpu_count": 12,
+  "cpu_count_logical": 12,
+  "disk": {
+    "/": {
+      "total": "494384795648",
+      "used": "303688462336"
+    }
+  },
+  "memory": {
+    "total": "25769803776"
+  },
+  "apple": {
+    "name": "Apple M4 Pro",
+    "ecpuCores": 4,
+    "pcpuCores": 8,
+    "gpuCores": 16,
+    "memoryGb": 24,
+    "ramTotalBytes": "25769803776"
+  },
+  "writerId": "zt5rkwx71e2yg690xcjowl81zbcssl6s"
+}

@@ -1,0 +1,16 @@
+wandb_version: 1
+
+batch_size:
+  value: 32
+epochs:
+  value: 3
+model:
+  value: densenet
+optimizer.lr:
+  value: 0.0026070223892814335
+optimizer.name:
+  value: AdamW
+optimizer.weight_decay:
+  value: 0.001
+wandb.enabled:
+  value: true
