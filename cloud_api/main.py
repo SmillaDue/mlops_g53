@@ -8,7 +8,7 @@ from torchvision import transforms
 from model import DenseNetModel
 
 MODEL_BUCKET = "mlops-brain-tumor"
-MODEL_BLOB = "densenet_untrained.pt"
+MODEL_BLOB = "models/final_model.pth"
 
 DEVICE = torch.device("cpu")
 model = None 
@@ -106,3 +106,6 @@ def predict(request):
 
     except Exception as e:
         return (json.dumps({"error": str(e)}), 500, {"Content-Type": "application/json"})
+
+
+
