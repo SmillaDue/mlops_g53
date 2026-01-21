@@ -25,7 +25,7 @@ from mlops_project.utils import ArrayPreprocessing, TensorsPreprocessing
 PROJECT_ROOT = Path(os.getcwd())  # adjust if needed
 CONFIG_DIR = PROJECT_ROOT / "configs/"  # where the yaml's are
 MODEL_BUCKET = "mlops-brain-tumor"
-MODEL_OBJECT = "models/model.pth"
+MODEL_OBJECT = "models/final_model.pth"
 LOCAL_MODEL = Path("/tmp/model.pth")
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
