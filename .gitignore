@@ -181,11 +181,10 @@ cython_debug/
 *.pth
 
 # data
-data/
+data/processed
 
 # Model checkpoints
 models/
 
 # Hydra outputs
 outputs/
-/data
