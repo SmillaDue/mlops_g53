@@ -267,9 +267,8 @@ Another important use case is collaborative work. When multiple team members mod
 > Example:
 > *We used a simple argparser, that worked in the following way: Python  my_script.py --lr 1e-3 --batch_size 25*
 >
-> Answer:
+> Answer: We configured our experiments using Hydra-based configuration files. A default configuration defines global settings such as logging and training parameters, which is then composed with separate training and model-specific configuration files. This allows us to easily switch models or adjust hyperparameters without changing the training code. Experiments can be run by overriding configuration values.
 
---- question 12 fill here ---
 
 ### Question 13
 
