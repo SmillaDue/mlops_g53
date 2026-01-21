@@ -11,45 +11,10 @@ from mlops_project.data import brain_tumor
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
-MODEL_BUCKET = "mlops-brain-tumor"
-MODEL_OBJECT = "models/model.pth"
+import subprocess
+subprocess.run(["dvc", "pull"], check=True)
 
-MODEL_PREFIX = "models/model.pth"
-DATA_PREFIX = "data"  # folder in the bucket
-
-LOCAL_DATA = Path(DATA_PREFIX) / "processed"
-LOCAL_MODEL = Path(MODEL_PREFIX)
-
-
-def ensure_data():
-    client = storage.Client()
-    bucket = client.bucket(MODEL_BUCKET)
-
-    # Ensure local folder exists
-    LOCAL_DATA.mkdir(parents=True, exist_ok=True)
-
-    # --- Download model ---
-    if not LOCAL_MODEL.exists():
-        blob = bucket.blob(MODEL_PREFIX)
-        blob.download_to_filename(str(LOCAL_MODEL))
-
-    # --- Download all data files ---
-    blobs = bucket.list_blobs(prefix=DATA_PREFIX)
-
-    for blob in blobs:
-        # Skip "directory" placeholders
-        if blob.name.endswith("/"):
-            continue
-
-        local_path = LOCAL_DATA / Path(blob.name).name
-        if local_path.exists():
-            continue
-
-        blob.download_to_filename(str(local_path))
-
-
-ensure_data()
-
+LOCAL_MODEL = Path("models/model.pth")
 
 @hydra.main(config_path="../../configs", config_name="default_config.yaml", version_base=None)
 def evaluate(config: DictConfig) -> None:
@@ -59,7 +24,7 @@ def evaluate(config: DictConfig) -> None:
 
     # Get batch size from config
     batch_size = config.batch_size
-    model_checkpoint = config.get("model_checkpoint", "models/model.pth")
+    model_checkpoint = config.get("model_checkpoint", LOCAL_MODEL)
     print(f"Loading model from: {model_checkpoint}")
 
     model = hydra.utils.instantiate(config.model).to(DEVICE)

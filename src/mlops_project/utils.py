@@ -20,7 +20,7 @@ def show_image_and_target(images, targets, show=True):
 
     for ax, image, target in zip(axes, images, targets):
         if hasattr(image, "permute"):  # torch.Tensor
-            image = ScaleIntensity()(image)
+            image = ScaleIntensity()(image) # Scale to values in [0,1]
             image = image.permute(1, 2, 0)  # -> (H, W, 1)
             image = image.numpy()
 

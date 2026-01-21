@@ -2,11 +2,18 @@ import os
 from pathlib import Path
 
 import torch
+from google.cloud import storage
 
 from mlops_project.utils import ArrayPreprocessing, TensorsPreprocessing
 
+import subprocess
+subprocess.run(["dvc", "pull"], check=True)
+
 # hyperparameter
 IMG_SIZE = 256
+
+BASE_DIR = Path(os.environ.get("DATA_DIR", "data/processed"))
+
 
 
 #### Load training data ######
@@ -140,12 +147,11 @@ def preprocess_data(raw_data_dir: str, processed_data_dir: str):
 
 def brain_tumor() -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
     """Return train and test datasets for corrupt MNIST."""
-    base_dir = Path(os.environ.get("DATA_DIR", "data/processed"))
 
-    train_images = torch.load(base_dir / "train_images.pt", weights_only=False)
-    train_target = torch.load(base_dir / "train_targets.pt", weights_only=False)
-    test_images = torch.load(base_dir / "test_images.pt", weights_only=False)
-    test_target = torch.load(base_dir / "test_targets.pt", weights_only=False)
+    train_images = torch.load(BASE_DIR / "train_images.pt", weights_only=False)
+    train_target = torch.load(BASE_DIR / "train_targets.pt", weights_only=False)
+    test_images = torch.load(BASE_DIR / "test_images.pt", weights_only=False)
+    test_target = torch.load(BASE_DIR / "test_targets.pt", weights_only=False)
 
     train_set = torch.utils.data.TensorDataset(train_images, train_target)
     test_set = torch.utils.data.TensorDataset(test_images, test_target)
