@@ -122,18 +122,11 @@ will check the repositories and the code to verify your answers.
 >
 > Answer: 53
 
---- question 1 fill here ---
-
 ### Question 2
 > **Enter the study number for each member in the group**
 >
-> Example:
->
-> *sXXXXXX, sXXXXXX, sXXXXXX*
 >
 > Answer: s243656 , s204153, s252263, s243659
-
---- question 2 fill here ---
 
 ### Question 3
 > **A requirement to the project is that you include a third-party package not covered in the course. What framework**
@@ -141,15 +134,10 @@ will check the repositories and the code to verify your answers.
 >
 > Recommended answer length: 100-200 words.
 >
-> Example:
-> *We used the third-party framework ... in our project. We used functionality ... and functionality ... from the*
-> *package to do ... and ... in our project*.
 >
 > Answer: We made use of a package called MONAI, which is a deep learning, PyTorch-based framework specifically designed for medical imaging applications. The overall plan of the project is to implement a model using this framework, train it on medical imaging data, and evaluate the resulting performance. MONAI provides a range of ready-made modules for deep learning architectures, data handling, and training pipelines, which we make use of throughout the project to simplify development and ensure best practices within medical imaging.
 
 In the setup phase, we first familiarize ourselves with the MONAI framework and its core components. We then implement a baseline model using MONAI’s architecture modules and training utilities. To better understand the benefits and limitations of the framework, we compare this MONAI-based model against another deep learning model that is implemented without using the MONAI package. This comparison allows us to assess differences in performance, implementation complexity, and flexibility, and helps us evaluate whether MONAI provides a meaningful advantage for our specific medical imaging task.
-
---- question 3 fill here ---
 
 ## Coding environment
 
@@ -163,13 +151,7 @@ In the setup phase, we first familiarize ourselves with the MONAI framework and 
 >
 > Recommended answer length: 100-200 words
 >
-> Example:
-> *We used ... for managing our dependencies. The list of dependencies was auto-generated using ... . To get a*
-> *complete copy of our development environment, one would have to run the following commands*
->
 > Answer: We used uv to manage our dependencies, as it allows us to automatically handle and update dependencies within the project, removing the tedious job of adding them manually. Whenever we wanted to add a new package, we used the "command uv add <package name>", which automatically added it to the uv lock file that stores all required packages and versions. This approach ensures consistency across the project. In this way, everyone can activate and work within the same virtual environment, provided that we regularly pull updates and work on the most recent version of the project during collaborative team development.
-
---- question 4 fill here ---
 
 ### Question 5
 
@@ -178,14 +160,7 @@ In the setup phase, we first familiarize ourselves with the MONAI framework and 
 >
 > Recommended answer length: 100-200 words
 >
-> Example:
-> *From the cookiecutter template we have filled out the ... , ... and ... folder. We have removed the ... folder*
-> *because we did not use any ... in our project. We have added an ... folder that contains ... for running our*
-> *experiments.*
->
 > Answer: The cookiecutter template is very nicely set up for developing a model and its related files in a clear and well-structured format. We have filled out the data, evaluate, model, train, and visualize files required for the model setup and experimentation. In addition, we completed several of the workflow files to ensure proper version control and automated checks on GitHub. To make sure that figures, plots, and other testing notes are kept in a single, organized location, we used the figures folder within the reports directory to store these outputs. Finally, to properly configure the models and training procedures, we populated the configs folder with the corresponding configuration files for each experiment.
-
---- question 5 fill here ---
 
 ### Question 6
 
@@ -194,16 +169,11 @@ In the setup phase, we first familiarize ourselves with the MONAI framework and 
 >
 > Recommended answer length: 100-200 words.
 >
-> Example:
-> *We used ... for linting and ... for formatting. We also used ... for typing and ... for documentation. These*
-> *concepts are important in larger projects because ... . For example, typing ...*
 >
 > Answer: We implemented rules for code quality in the linting file within the workflows folder. For this we use ruff format and ruff check to make sure the code is both consistent with the standard and see if any problems need to be fixed. For documentation we made sure to add relevant comments when necessary. We also documented... 
 
 These concepts matter greatly in larger projects because they make the codebase easier to understand, maintain, and extend over time. When multiple people work on the same project, consistent formatting, typing, and documentation reduce confusion and lower the risk of errors. They also make onboarding new contributors faster and help ensure that changes can be made confidently without breaking existing functionality.
 
-
---- question 6 fill here ---
 
 ## Version control
 
@@ -220,11 +190,9 @@ These concepts matter greatly in larger projects because they make the codebase 
 > *In total we have implemented X tests. Primarily we are testing ... and ... as these the most critical parts of our*
 > *application but also ... .*
 >
-> Answer: we implemented tests, which make sure that both the data and the model runs smoothly every time we push something new into the project. It runs both pytests and coverage. 
+> Answer: We implemented tests, which make sure that both the data and the model runs smoothly every time we push something new into the project. It runs both pytests and coverage. 
 For the data it does: check dataset loads correctly, verify the number og samples in training and test set, validate that each image is a 3d tensor in correct format and ensures correct label format. 
 The model test makes sure the model can run with different batch sizes and that the output format is correct. 
-
---- question 7 fill here ---
 
 ### Question 8
 
@@ -239,8 +207,6 @@ The model test makes sure the model can run with different batch sizes and that 
 >
 > Answer: CAN ONLY BE ANSWERED IN THE END OF PROJECT 
 
---- question 8 fill here ---
-
 ### Question 9
 
 > **Did you workflow include using branches and pull requests? If yes, explain how. If not, explain how branches and**
@@ -248,13 +214,9 @@ The model test makes sure the model can run with different batch sizes and that 
 >
 > Recommended answer length: 100-200 words.
 >
-> Example:
-> *We made use of both branches and PRs in our project. In our group, each member had an branch that they worked on in*
-> *addition to the main branch. To merge code we ...*
 >
-> Answer:Yes, we both made use of both branches and PRs. Everytime we would work on a specific issue/feature of the project, we build a branch related to this such that we might merge it on later. Pull requests were also used to make sure someone has gone through and confirmed the proposed code/update. This gave us a nice workflow because we could perform tests automatically by running it through the workflows we had setup which both checked formatting, quality and coverage, which makes it alot easier to improve and debug relevant code. If we hadn't done this, it would've been a lot harder to solve conflict because nobody would need to approve or test the update. 
+> Answer: Yes, we both made use of both branches and PRs. Everytime we would work on a specific issue/feature of the project, we build a branch related to this such that we might merge it on later. Pull requests were also used to make sure someone has gone through and confirmed the proposed code/update. This gave us a nice workflow because we could perform tests automatically by running it through the workflows we had setup which both checked formatting, quality and coverage, which makes it alot easier to improve and debug relevant code. If we hadn't done this, it would've been a lot harder to solve conflict because nobody would need to approve or test the update. 
 
---- question 9 fill here ---
 
 ### Question 10
 
@@ -268,8 +230,9 @@ The model test makes sure the model can run with different batch sizes and that 
 > *pipeline*
 >
 > Answer:
-
---- question 10 fill here ---
+> In our project, we did not use a data version control system such as DVC because we worked with a single, fixed dataset that did not change throughout the development process. We only did preprocessing in the beginning and also this was the task of only one team member. So the dataset was stable and also relatively small, making manual handling sufficient for our use case.
+However, data version control would become highly beneficial in more complex scenarios, particularly when datasets evolve over time or multiple experiments depend on different data states. When data preprocessing would be a more iterative process it would be very helpful to have some sort of DVC. With that each processed version of the dataset can be versioned and linked to a specific experiment or model. This makes it possible to reproduce results exactly and to compare how changes in the data influence model performance.
+Another important use case is collaborative work. When multiple team members modify or extend a dataset (for example, adding new samples or correcting labels), DVC helps track who changed what and when. 
 
 ### Question 11
 
@@ -284,9 +247,10 @@ The model test makes sure the model can run with different batch sizes and that 
 > *and one for running ... . In particular for our ..., we used ... .An example of a triggered workflow can be seen*
 > *here: <weblink>*
 >
-> Answer:
-
---- question 11 fill here ---
+> Answer: Our continuous integration setup uses GitHub Actions to automatically run code linting and unit tests on every push and pull request to the main branch. The workflows execute ruff-based linting and formatting checks as well as pytest-based unit tests with coverage across multiple operating systems (Linux, Windows, and macOS) using a fixed Python version, with dependency caching enabled to speed up execution.
+> 
+> Linting workflow: (https://github.com/SmillaDue/mlops_g53/actions/runs/21037845125/workflow)
+> Unit test workflow: (https://github.com/SmillaDue/mlops_g53/actions/runs/21183711060/workflow)
 
 ## Running code and tracking experiments
 
@@ -319,8 +283,9 @@ The model test makes sure the model can run with different batch sizes and that 
 > *one would have to do ...*
 >
 > Answer:
+> Reproducibility was ensured by running all experiments in a controlled and fully logged environment. Training is driven by Hydra configuration files, meaning that all hyperparameters, model choices, optimizer settings, and logging options are defined declaratively and can be reproduced by rerunning the same configuration. For each run, the fully resolved configuration is logged to Weights & Biases, ensuring that no information about the experimental setup is lost.
+During training, step-level, epoch-level, and final performance metrics are logged, providing a complete record of the training process. In addition, trained model checkpoints are stored as Weights & Biases artifacts, which allows specific models to be traced back to the exact run and configuration that produced them. Random seeds are fixed for model initialization and dataset splitting to reduce variability across runs.
 
---- question 13 fill here ---
 
 ### Question 14
 
