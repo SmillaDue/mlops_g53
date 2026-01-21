@@ -188,3 +188,4 @@ models/
 
 # Hydra outputs
 outputs/
+/data
