@@ -113,6 +113,6 @@ class TensorsPreprocessing:
 
         imgs = np.stack(imgs, axis=0)
         imgs = torch.from_numpy(imgs).float() / 255.0
-        imgs = imgs.permute(0, 3, 1, 2) # (N, C, H, W)
+        imgs = imgs.permute(0, 3, 1, 2)  # (N, C, H, W)
         imgs = (imgs - imgs.mean()) / (imgs.std())
         return imgs

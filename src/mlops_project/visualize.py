@@ -100,10 +100,7 @@ def visualize(config: DictConfig) -> None:
         plt.scatter(embeddings[mask, 0], embeddings[mask, 1], label=str(i))
     plt.legend()
     plt.savefig(f"reports/figures/{figure_name}")
-<<<<<<< HEAD
     plt.close()
-=======
->>>>>>> main
 
 
 if __name__ == "__main__":

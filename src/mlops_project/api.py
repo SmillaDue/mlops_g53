@@ -57,7 +57,7 @@ async def lifespan(app: FastAPI):
     - Ensures the trained model is available locally.
     - Stores the configuration on `app.state` for later use.
     """
-    
+
     # Important if the app reloads (uvicorn --reload) or tests import multiple times
     GlobalHydra.instance().clear()
 
@@ -157,7 +157,7 @@ def get_preprocessed_image():
     """
     Retrieve the most recently preprocessed image produced by the
     `/inference/` endpoint.
-    """    
+    """
 
     path = Path("image_preprocessed.png")
 
