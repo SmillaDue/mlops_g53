@@ -5,7 +5,7 @@ num_classes: ${num_classes}
 
 spatial_dims: 2
 
-pretrained: false
+pretrained: true
 
 init_features: 64
 growth_rate: 32

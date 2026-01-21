@@ -1,0 +1,49 @@
+program: src/mlops_project/train.py
+method: bayes
+metric:
+  name: val/loss_epoch
+  goal: minimize
+
+parameters:
+  # Model architecture
+  model:
+    value: densenet
+  
+  # Key training hyperparameters
+  batch_size:
+    values: [16, 32, 64]
+  
+  epochs:
+    value: 15  # More epochs for DenseNet
+  
+  # Optimizer settings
+  optimizer.name:
+    values: [AdamW]
+  
+  optimizer.lr:
+    distribution: log_uniform_values
+    min: 0.00001
+    max: 0.001
+  
+  optimizer.weight_decay:
+    values: [0.001]
+  
+  # Model-specific parameters
+  model.pretrained:
+    values: [true]  # Compare fine-tuning vs training from scratch
+  
+  model.dropout_prob:
+    values: [0.2]
+  
+  model.growth_rate:
+    values: [32]  # Growth rate affects model capacity
+  
+  # Fixed parameters
+  seed:
+    value: 42
+  
+  wandb.enabled:
+    value: true
+  
+  print_every:
+    value: 50

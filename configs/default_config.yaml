@@ -10,7 +10,7 @@ wandb:
   enabled: true
   project: smallcnn
   entity: brainy_mlops
-  name: first_run
+  name: densenet_param_1
   tags: []
   log_every: 50
   log_model: true
