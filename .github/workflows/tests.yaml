@@ -31,11 +31,15 @@ jobs:
       - name: Install dependencies
         run: |
           uv sync --dev --locked
+        
+      - name: Retrieve data
+        run: |
+          uv run dvc pull
 
       - name: Run unit tests with coverage
         run: |
-          uv run coverage run -m pytest tests/unittests
-          uv run coverage report -m > reports/coverage_report.out
+          uv run coverage run --data-file=.coverage -m pytest tests/unittests
+          uv run coverage report --data-file=.coverage -m > reports/coveragereport.out
 
       - name: Run integration tests
         run: |
