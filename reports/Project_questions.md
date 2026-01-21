@@ -301,6 +301,7 @@ During training, step-level, epoch-level, and final performance metrics are logg
 > *As seen in the second image we are also tracking ... and ...*
 >
 > Answer:
+> ![Example Sweep](../figures/sweep.png)
 
 --- question 14 fill here ---
 
