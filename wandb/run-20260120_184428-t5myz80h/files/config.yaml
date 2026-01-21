@@ -1,0 +1,105 @@
+_wandb:
+    value:
+        cli_version: 0.23.1
+        e:
+            a80t713kq4bspriwkpxy2forx1ntyfov:
+                apple:
+                    ecpuCores: 4
+                    gpuCores: 16
+                    memoryGb: 24
+                    name: Apple M4 Pro
+                    pcpuCores: 8
+                    ramTotalBytes: "25769803776"
+                    swapTotalBytes: "6442450944"
+                cpu_count: 12
+                cpu_count_logical: 12
+                disk:
+                    /:
+                        total: "494384795648"
+                        used: "365653516288"
+                email: smilla.due@live.com
+                executable: /Users/smilladue/Desktop/Documents/DTU/ML-ops/mlops_g53/.venv/bin/python3
+                git:
+                    commit: c52210652dc58dcaee252b70016ad43b968a92b3
+                    remote: https://github.com/SmillaDue/mlops_g53.git
+                host: MacBook-Pro.local
+                memory:
+                    total: "25769803776"
+                os: macOS-15.7.2-arm64-arm-64bit-Mach-O
+                program: -m mlops_project.train
+                python: CPython 3.13.7
+                root: /Users/smilladue/Desktop/Documents/DTU/ML-ops/mlops_g53
+                startedAt: "2026-01-20T17:44:28.808405Z"
+                writerId: a80t713kq4bspriwkpxy2forx1ntyfov
+        m: []
+        python_version: 3.13.7
+        t:
+            "1":
+                - 1
+                - 5
+                - 41
+                - 48
+                - 50
+                - 53
+            "2":
+                - 1
+                - 5
+                - 41
+                - 48
+                - 50
+                - 53
+            "3":
+                - 2
+                - 13
+                - 15
+                - 16
+                - 61
+            "4": 3.13.7
+            "5": 0.23.1
+            "12": 0.23.1
+            "13": darwin-arm64
+batch_size:
+    value: 32
+device:
+    value: mps
+epochs:
+    value: 10
+in_channels:
+    value: 1
+max_steps:
+    value: -1
+model:
+    value:
+        _target_: mlops_project.model.DenseNetModel
+        block_config:
+            - 6
+            - 12
+            - 24
+            - 16
+        dropout_prob: 0
+        growth_rate: 32
+        in_channels: 1
+        init_features: 64
+        num_classes: 4
+        pretrained: true
+        spatial_dims: 2
+num_classes:
+    value: 4
+optimizer:
+    value:
+        lr: 0.0001
+        name: AdamW
+        weight_decay: 0.001
+print_every:
+    value: 50
+seed:
+    value: 42
+wandb:
+    value:
+        enabled: true
+        entity: brainy_mlops
+        log_every: 50
+        log_model: true
+        name: densenet_param_1
+        project: smallcnn
+        tags: []

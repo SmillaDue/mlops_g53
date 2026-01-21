@@ -83,11 +83,11 @@ class DenseNetModel(nn.Module):
         in_channels: int = 1,
         num_classes: int = 4,
         spatial_dims: int = 2,
-        pretrained: bool = False,
+        pretrained: bool = True,
         init_features: int = 64,
         growth_rate: int = 32,
         block_config: tuple[int, int, int, int] = (6, 12, 24, 16),
-        dropout_prob: float = 0.0,
+        dropout_prob: float = 0.1,
     ):
         super().__init__()
         self.net = DenseNet121(
