@@ -16,6 +16,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.ba
 # subprocess.run(["dvc", "pull"], check=True)
 # LOCAL_MODEL = Path("models/model.pth"
 
+
 @hydra.main(config_path="../../configs", config_name="default_config.yaml", version_base=None)
 def evaluate(config: DictConfig) -> None:
     """Evaluate a trained model."""

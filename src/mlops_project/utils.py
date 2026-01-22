@@ -1,14 +1,14 @@
 import math
+from pathlib import Path
 
 import cv2
 import imutils
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
+from google.cloud import storage
 from monai.transforms import ScaleIntensity
 
-from google.cloud import storage
-from pathlib import Path
 
 def ensure_data_and_model():
     MODEL_BUCKET = "mlops-brain-tumor"
@@ -18,7 +18,7 @@ def ensure_data_and_model():
 
     LOCAL_DATA = Path(DATA_PREFIX) / "processed"
     LOCAL_MODEL = Path(MODEL_PREFIX)
-    
+
     client = storage.Client()
     bucket = client.bucket(MODEL_BUCKET)
 
@@ -44,6 +44,7 @@ def ensure_data_and_model():
 
         blob.download_to_filename(str(local_path))
     return MODEL_BUCKET, MODEL_PREFIX, DATA_PREFIX, LOCAL_DATA, LOCAL_MODEL
+
 
 def show_image_and_target(images, targets, show=True):
     """Display images with their corresponding targets in a single grid."""

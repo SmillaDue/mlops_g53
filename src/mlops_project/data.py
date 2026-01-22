@@ -16,6 +16,7 @@ IMG_SIZE = 256
 
 BASE_DIR = Path(os.environ.get("DATA_DIR", "data/processed"))
 
+
 #### Load training data ######
 def load_data(raw_data_dir: str):
     """Load training and testing data from raw data directory.

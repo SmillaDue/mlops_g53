@@ -1,8 +1,8 @@
 import os
 import random
+import subprocess
 from collections import Counter, defaultdict
 from pathlib import Path
-import subprocess
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,7 +13,7 @@ from mlops_project.utils import ArrayPreprocessing, TensorsPreprocessing, ensure
 from PIL import Image
 
 MODEL_BUCKET, MODEL_PREFIX, DATA_PREFIX, LOCAL_DATA, LOCAL_MODEL = ensure_data_and_model()
-    
+
 
 def test_dataset_loading(img_size: int = 256):
     raw_data_dir = "data/raw"

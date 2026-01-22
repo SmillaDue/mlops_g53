@@ -11,9 +11,8 @@ from omegaconf import DictConfig
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
-from wandb import config
-
 from mlops_project.utils import ensure_data_and_model
+from wandb import config
 
 IS_LINUX = sys.platform.startswith("linux")
 if IS_LINUX:
@@ -28,10 +27,11 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.ba
 
 # LOCAL_MODEL = Path("models/model.pth")
 
+
 @hydra.main(config_path="../../configs", config_name="default_config.yaml", version_base=None)
 def visualize(config: DictConfig) -> None:
     """Visualize model predictions."""
-    
+
     figure_name: str = "embeddings.png"
     model_checkpoint: Path = LOCAL_MODEL
 

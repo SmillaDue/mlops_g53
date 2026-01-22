@@ -11,7 +11,7 @@ from google.cloud import storage
 from torch import Tensor
 from torch.utils.data import Dataset
 
-from mlops_project.utils import ArrayPreprocessing, TensorsPreprocessing, show_image_and_target, ensure_data_and_model
+from mlops_project.utils import ArrayPreprocessing, TensorsPreprocessing, ensure_data_and_model, show_image_and_target
 
 # subprocess.run(["dvc", "pull", "data"], check=True)
 
@@ -179,4 +179,3 @@ seed: {seed}
 if __name__ == "__main__":
     MODEL_BUCKET, MODEL_PREFIX, DATA_PREFIX, LOCAL_DATA, LOCAL_MODEL = ensure_data_and_model()
     dataset_statistics()
-

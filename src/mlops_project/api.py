@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import subprocess
 import base64
 import os
 import re
+import subprocess
 from contextlib import asynccontextmanager
 from enum import Enum
 from http import HTTPStatus
@@ -28,6 +28,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.ba
 PROJECT_ROOT = Path(os.getcwd())  # adjust if needed
 CONFIG_DIR = PROJECT_ROOT / "configs/"  # where the yaml's are
 
+
 def ensure_model():
     """
     Ensure that the trained model weights exist locally.
@@ -46,6 +47,7 @@ def ensure_model():
     bucket = client.bucket(MODEL_BUCKET)
     blob = bucket.blob(MODEL_OBJECT)
     blob.download_to_filename(str(LOCAL_MODEL))
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
