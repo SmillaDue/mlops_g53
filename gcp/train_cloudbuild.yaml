@@ -1,0 +1,24 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    env:
+      - 'DOCKER_BUILDKIT=1'
+    id: 'Build container image'
+    args:
+      [
+        'build',
+        '-t',
+        'europe-west1-docker.pkg.dev/$PROJECT_ID/mlops-g53-repo/$_IMAGE_NAME',
+        '-f',
+        'dockerfiles/train.dockerfile',
+        '.'
+      ]
+
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Push container image'
+    args: ['push', 'europe-west1-docker.pkg.dev/$PROJECT_ID/mlops-g53-repo/$_IMAGE_NAME']
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+substitutions:
+  _IMAGE_NAME: 'train:latest'
