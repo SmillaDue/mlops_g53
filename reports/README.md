@@ -512,7 +512,7 @@ curl -X POST "https://europe-west1-mlops-g53.cloudfunctions.net/brain-inference-
 
 > **Did you perform any unit testing and load testing of your API? If yes, explain how you did it and what results for**
 > **the load testing did you get. If not, explain how you would do it.**
->
+> 
 > Recommended answer length: 100-200 words.
 >
 > Example:
@@ -521,7 +521,7 @@ curl -X POST "https://europe-west1-mlops-g53.cloudfunctions.net/brain-inference-
 >
 > Answer:
 
---- question 25 fill here ---
+We did perform unit tests to test the response from the API, to check whether it responded correctly. Our inference API expects an image of any size, and will resize it to fit as input to the model. Therefore we do a random generated array and post it to the API, and checks whether it responded correctly. If we had done load testing we would have used locust and define the tasks a user could do. Then run the loadtest where each "user" repeatedly send image inference requests, sometimes querying the root and the fetching of a preprocessed image. With locust we could gradually increase the number of users and get measures like response time, througput and amount of errors. Doing the load testing would give insights of the API's performance bottlenecks and scalability. Additionaly we could have added the load test to our CI/CD pipeline.
 
 ### Question 26
 
@@ -604,7 +604,11 @@ Based on these metrics, we configured alerting policies in Google Cloud Monitori
 >
 > Answer:
 
---- question 30 fill here ---
+Throughout the project we struggled alot with the cloud both for setting up training and deployment, and is where we spent most time. 
+Especially getting the model training to work optimally was an issue. But considering the time we spent on it, we ended up making shell scripts and config files to ease the process and in the end setting up triggers connected to the project repo on Github, which automatically builds docker images for both training a model and for the API, then pushing them to the bucket and end with automatically deploying the API on Cloud Run. 
+Especially setting up how to deploy our sweep to vertex AI caused alot of issues, since it required many steps and usage of several tools at once. We had to handle service accounts and permissions, ensure that the correct container image was built and pushed to Artifact Registry, and dynamically generate a YAML configuration for each run. In addition, the script had to securely retrieve the local Weights & Biases API key and inject it into the training environment, while also mounting and downloading the dataset from Google Cloud Storage inside the container before training could start.
+
+We overcame the most challenges by first trying to follow the steps in the course homepage for most tasks. If that didn't work then we would have a conversion with e.g. Copilot, but as part of this process we also learned how to ask the right questions. 
 
 ### Question 31
 

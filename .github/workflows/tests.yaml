@@ -63,6 +63,6 @@ jobs:
           uv run coverage run --data-file=.coverage -m pytest tests/unittests
           uv run coverage report --data-file=.coverage -m > reports/coveragereport.out
 
-      # - name: Run integration tests
-      #   run: |
-      #     uv run pytest tests/integrationtests
+      - name: Run integration tests
+        run: |
+          uv run pytest tests/integrationtests
