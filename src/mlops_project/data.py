@@ -161,4 +161,3 @@ def brain_tumor() -> tuple[torch.utils.data.Dataset, torch.utils.data.Dataset]:
 
 if __name__ == "__main__":
     preprocess_data("data/raw", "data/processed")
-
