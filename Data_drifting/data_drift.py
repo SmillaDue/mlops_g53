@@ -4,7 +4,7 @@ from evidently.legacy.report import Report
 from evidently.legacy.metric_preset import DataDriftPreset, DataQualityPreset, TargetDriftPreset
 
 
-feature_columns = ["avg_brightness", "contrast", "sharpness"]
+feature_columns = ["avg_brightness", "contrast", "sharpness", "prediction", "target"]
 
 
 reference_data = pd.read_csv("data_api/reference_features.csv")[feature_columns]
