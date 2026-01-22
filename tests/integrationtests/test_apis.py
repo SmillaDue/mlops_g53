@@ -7,8 +7,7 @@ from fastapi.testclient import TestClient
 from mlops_project.api import app
 
 
-
-@pytest.fixture(autouse=True, scope='session')
+@pytest.fixture(autouse=True, scope="session")
 def clean_generated_images():
     """
     Ensure that image artifacts created by the API
