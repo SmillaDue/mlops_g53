@@ -1,12 +1,24 @@
-FROM ghcr.io/astral-sh/uv:python3.13-alpine AS base
+FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim AS base
 
-COPY uv.lock uv.lock
-COPY pyproject.toml pyproject.toml
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential gcc g++ gfortran \
+    python3-dev pkg-config \
+    libopenblas-dev \
+    libgl1 \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN uv sync --frozen --no-install-project
+WORKDIR /
 
-COPY src src/
+# Copy dependency metadata
+COPY uv.lock pyproject.toml README.md LICENSE tasks.py ./
 
-RUN uv sync --frozen
+# Copy code
+COPY src/ src/
+COPY configs/ configs/
 
-ENTRYPOINT ["uv", "run", "uvicorn", "src.mlops_project.api:app", "--host", "0.0.0.0", "--port", "8000"]
+# Install deps
+RUN uv sync --frozen --no-dev
+
+EXPOSE 8080
+ENTRYPOINT ["uvx", "invoke", "api"]

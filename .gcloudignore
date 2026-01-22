@@ -1,0 +1,17 @@
+# DVC-managed artifacts
+data/
+models/
+.dvc/cache/
+
+# Python / build noise
+__pycache__/
+*.pyc
+.venv/
+.uv/
+
+# Git
+.git/
+.gitignore
+
+# Reports / outputs
+reports/

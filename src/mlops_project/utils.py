@@ -1,11 +1,49 @@
 import math
+from pathlib import Path
 
 import cv2
 import imutils
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
+from google.cloud import storage
 from monai.transforms import ScaleIntensity
+
+
+def ensure_data_and_model():
+    MODEL_BUCKET = "mlops-brain-tumor"
+
+    MODEL_PREFIX = "models/final_model.pth"
+    DATA_PREFIX = "data"  # folder in the bucket
+
+    LOCAL_DATA = Path(DATA_PREFIX) / "processed"
+    LOCAL_MODEL = Path(MODEL_PREFIX)
+
+    client = storage.Client()
+    bucket = client.bucket(MODEL_BUCKET)
+
+    # Ensure local folder exists
+    LOCAL_DATA.mkdir(parents=True, exist_ok=True)
+
+    # --- Download model ---
+    if not LOCAL_MODEL.exists():
+        blob = bucket.blob(MODEL_PREFIX)
+        blob.download_to_filename(str(LOCAL_MODEL))
+
+    # --- Download all data files ---
+    blobs = bucket.list_blobs(prefix=DATA_PREFIX)
+
+    for blob in blobs:
+        # Skip "directory" placeholders
+        if blob.name.endswith("/"):
+            continue
+
+        local_path = LOCAL_DATA / Path(blob.name).name
+        if local_path.exists():
+            continue
+
+        blob.download_to_filename(str(local_path))
+    return MODEL_BUCKET, MODEL_PREFIX, DATA_PREFIX, LOCAL_DATA, LOCAL_MODEL
 
 
 def show_image_and_target(images, targets, show=True):
@@ -20,7 +58,7 @@ def show_image_and_target(images, targets, show=True):
 
     for ax, image, target in zip(axes, images, targets):
         if hasattr(image, "permute"):  # torch.Tensor
-            image = ScaleIntensity()(image)
+            image = ScaleIntensity()(image)  # Scale to values in [0,1]
             image = image.permute(1, 2, 0)  # -> (H, W, 1)
             image = image.numpy()
 
@@ -89,7 +127,7 @@ class ArrayPreprocessing:
 
         img = self.gray_scale(img)
         img = self.resize(img)
-        img = img[None, :, :]  # shape (1,H,W)
+        img = img[:, :, None]  # shape (H,W,1)
         return img
 
     def load(self, img_path):
@@ -107,7 +145,12 @@ class ArrayPreprocessing:
 
 class TensorsPreprocessing:
     def __call__(self, imgs):
+        # If a single image is passed as (H, W, C), wrap it
+        if isinstance(imgs, np.ndarray) and imgs.ndim == 3:
+            imgs = [imgs]
+
         imgs = np.stack(imgs, axis=0)
         imgs = torch.from_numpy(imgs).float() / 255.0
+        imgs = imgs.permute(0, 3, 1, 2)  # (N, C, H, W)
         imgs = (imgs - imgs.mean()) / (imgs.std())
         return imgs

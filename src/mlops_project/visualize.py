@@ -1,24 +1,43 @@
+import os
+import sys
+from pathlib import Path
+
 import hydra
+import matplotlib
 import matplotlib.pyplot as plt
 import torch
+from google.cloud import storage
 from omegaconf import DictConfig
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
+from mlops_project.utils import ensure_data_and_model
 from wandb import config
 
+IS_LINUX = sys.platform.startswith("linux")
+if IS_LINUX:
+    # Use a headless backend (no display required)
+    import matplotlib
+
+    matplotlib.use("Agg")
+
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+
+# import subprocess
+
+# LOCAL_MODEL = Path("models/model.pth")
 
 
 @hydra.main(config_path="../../configs", config_name="default_config.yaml", version_base=None)
 def visualize(config: DictConfig) -> None:
     """Visualize model predictions."""
+
     figure_name: str = "embeddings.png"
-    model_checkpoint: str = "models/model.pth"
+    model_checkpoint: Path = LOCAL_MODEL
 
     model = hydra.utils.instantiate(config.model).to(DEVICE)
 
-    model.load_state_dict(torch.load(model_checkpoint))
+    model.load_state_dict(torch.load(model_checkpoint, map_location=DEVICE))
     model.eval()
     model.fc = torch.nn.Identity()
     batch_size = config.batch_size
@@ -54,7 +73,9 @@ def visualize(config: DictConfig) -> None:
         plt.scatter(embeddings[mask, 0], embeddings[mask, 1], label=str(i))
     plt.legend()
     plt.savefig(f"reports/figures/{figure_name}")
+    plt.close()
 
 
 if __name__ == "__main__":
+    MODEL_BUCKET, MODEL_PREFIX, DATA_PREFIX, LOCAL_DATA, LOCAL_MODEL = ensure_data_and_model()
     visualize()

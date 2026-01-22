@@ -180,11 +180,9 @@ cython_debug/
 *.pt
 *.pth
 
-# Processed data
-data/processed/
-
-# Model checkpoints
-models/
-
 # Hydra outputs
 outputs/
+
+# DVC managed folders:
+/data
+/models

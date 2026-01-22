@@ -33,6 +33,18 @@ def evaluate(ctx: Context, args: str = "") -> None:
 
 
 @task
+def api(ctx: Context, args: str = ""):
+    """API for inference initialisation"""
+    pythonpath = f"PYTHONPATH={os.getcwd()}/src" if not WINDOWS else f"set PYTHONPATH={os.getcwd()}\\src &&"
+    print(pythonpath)
+    cmd = f"{pythonpath} uv run uvicorn src.{PROJECT_NAME}.api:app --host 0.0.0.0 --port 8080"
+
+    if args:
+        cmd += f" {args}"
+    ctx.run(cmd, echo=True, pty=not WINDOWS)
+
+
+@task
 def test(ctx: Context) -> None:
     """Run tests."""
     pythonpath = f"PYTHONPATH={os.getcwd()}/src" if not WINDOWS else f"set PYTHONPATH={os.getcwd()}\\src &&"
