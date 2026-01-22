@@ -8,11 +8,9 @@ workerPoolSpecs:
       machineType: n1-highmem-4
     replicaCount: 1
     containerSpec:
-      imageUri: europe-west1-docker.pkg.dev/mlops-g53/mlops-g53-repo/train:edited
+      imageUri: europe-west1-docker.pkg.dev/mlops-g53/mlops-g53-repo/train:latest
       args:
         - "wandb.enabled=false"
-        - "max_steps=5"
-        - "epochs=1"
       env:
         - name: PYTHONUNBUFFERED
           value: "1"
