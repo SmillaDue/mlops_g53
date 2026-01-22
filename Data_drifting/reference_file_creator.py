@@ -1,17 +1,15 @@
-
-import os
 import csv
-from pathlib import Path
+import os
 from datetime import datetime, timezone
+from pathlib import Path
 
 import cv2
+import hydra
 import numpy as np
 import torch
-import hydra
 from google.cloud import storage
 from hydra import compose, initialize_config_dir
 from hydra.core.global_hydra import GlobalHydra
-
 from mlops_project.utils import ArrayPreprocessing, TensorsPreprocessing
 
 # --- paths / config ---
@@ -26,9 +24,7 @@ OUT_CSV = Path("data_api/reference_features.csv")
 N_PER_CLASS = 100
 CLASS_DIRS = ["glioma", "meningioma", "notumor", "pituitary"]
 
-DEVICE = torch.device(
-    "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
-)
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
 
 def ensure_model():
@@ -83,9 +79,7 @@ def main():
 
     with OUT_CSV.open("w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow(
-            ["time", "filename", "prediction", "target", "avg_brightness", "contrast", "sharpness"]
-        )
+        writer.writerow(["time", "filename", "prediction", "target", "avg_brightness", "contrast", "sharpness"])
 
         for class_name in CLASS_DIRS:
             folder = TRAIN_ROOT / class_name

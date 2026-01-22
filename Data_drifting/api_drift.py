@@ -156,7 +156,6 @@ from fastapi.responses import FileResponse
 from google.cloud import storage
 from hydra import compose, initialize_config_dir
 from hydra.core.global_hydra import GlobalHydra
-
 from mlops_project.utils import ArrayPreprocessing, TensorsPreprocessing
 
 PROJECT_ROOT = Path(os.getcwd())
@@ -169,9 +168,7 @@ LOCAL_MODEL = Path("/tmp/model.pth")
 DATA_DIR = PROJECT_ROOT / "data_api"
 CSV_PATH = DATA_DIR / "inference_features.csv"
 
-DEVICE = torch.device(
-    "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
-)
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
 FEATURE_COLUMNS = ["avg_brightness", "contrast", "sharpness"]
 
