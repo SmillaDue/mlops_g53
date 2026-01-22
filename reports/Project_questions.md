@@ -377,9 +377,10 @@ Storage : We used buckets, which is a part of the cloud storage service.
 > *We used the compute engine to run our ... . We used instances with the following hardware: ... and we started the*
 > *using a custom container: ...*
 >
-> Answer:
+> Answer: Google Compute Engine served as the underlying infrastructure for our cloud training workloads through Vertex AI. In our project, we made use of Compute Engine indirectly by running training jobs as Vertex AI custom jobs, where the required virtual machines are provisioned and managed automatically by Vertex AI.
+All experiments were executed on CPU-based Compute Engine instances, specifically n1-standard-2 virtual machines. While GPU-enabled instances are supported by Vertex AI, we did not make use of them in this project because enabling GPU resources requires additional quota approval, which was not feasible within the project timeline.
+Despite using only CPU instances, this setup was for developing, testing, and validating our training pipeline. The Compute Engine VMs were created on demand for each job and shut down automatically after completion, allowing for efficient resource usage without manual VM management.
 
---- question 18 fill here ---
 
 ### Question 19
 
