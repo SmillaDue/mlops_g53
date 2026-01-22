@@ -287,7 +287,7 @@ imutils==0.5.4
     # via mlops-project (pyproject.toml)
 iniconfig==2.3.0
     # via pytest
-invoke==2.2.0
+invoke==2.2.1
     # via mlops-project (pyproject.toml:dev)
 iterative-telemetry==0.0.10
     # via dvc
