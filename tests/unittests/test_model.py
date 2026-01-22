@@ -3,7 +3,6 @@ import pytest
 import torch
 from mlops_project.model import DeepCNN, DenseNetModel, SmallCNN
 
-
 @pytest.mark.parametrize("model", [SmallCNN, DeepCNN, DenseNetModel])
 @pytest.mark.parametrize("batch_size", [32, 64])
 def test_model(model, batch_size: int, num_classes: int = 4) -> None:

@@ -1,16 +1,19 @@
 import os
+import subprocess   
 import random
 from collections import Counter, defaultdict
 from pathlib import Path
-
+import subprocess
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 import torch
 from mlops_project.data import brain_tumor, load_data
+from mlops_project.utils import ensure_data_and_model
 from PIL import Image
 
-
+MODEL_BUCKET, MODEL_PREFIX, DATA_PREFIX, LOCAL_DATA, LOCAL_MODEL = ensure_data_and_model()
+    
 @pytest.mark.skipif(not os.path.exists("data/processed/train_images.pt"), reason="Data file not found")
 def test_loading_of_processed_data(img_size: int = 256):
     train_dataset, test_dataset = brain_tumor()
