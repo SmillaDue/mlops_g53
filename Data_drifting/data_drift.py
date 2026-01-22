@@ -20,7 +20,7 @@ report.run(reference_data=reference_data, current_data=current_data)
 report.save_html("data_drift.html")
 
 from evidently.legacy.test_suite import TestSuite
-
+from evidently.legacy.tests import TestNumberOfMissingValues
 data_test = TestSuite(tests=[TestNumberOfMissingValues()])
 data_test.run(reference_data=reference_data, current_data=current_data)
 result = data_test.as_dict()
