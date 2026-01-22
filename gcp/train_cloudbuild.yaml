@@ -1,6 +1,7 @@
-
 steps:
   - name: 'gcr.io/cloud-builders/docker'
+    env:
+      - 'DOCKER_BUILDKIT=1'
     id: 'Build container image'
     args:
       [
@@ -8,7 +9,7 @@ steps:
         '-t',
         'europe-west1-docker.pkg.dev/$PROJECT_ID/mlops-g53-repo/$_IMAGE_NAME',
         '-f',
-        'dockerfiles/api.dockerfile',
+        'dockerfiles/train.dockerfile',
         '.'
       ]
 
@@ -16,20 +17,8 @@ steps:
     id: 'Push container image'
     args: ['push', 'europe-west1-docker.pkg.dev/$PROJECT_ID/mlops-g53-repo/$_IMAGE_NAME']
 
-  - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'Deploy to Cloud Run'
-    args:
-      [
-        'run', 'deploy', 'inference-api',
-        '--image', 'europe-west1-docker.pkg.dev/$PROJECT_ID/mlops-g53-repo/$_IMAGE_NAME',
-        '--region', 'europe-west1',
-        '--platform', 'managed',
-        '--cpu', '2',
-        '--memory', '8Gi'
-      ]
-
 options:
   logging: CLOUD_LOGGING_ONLY
 
 substitutions:
-  _IMAGE_NAME: 'inference-api:latest'
+  _IMAGE_NAME: 'train:latest'

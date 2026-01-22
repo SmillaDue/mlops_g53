@@ -1,5 +1,6 @@
 import os
 import random
+import subprocess
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -8,7 +9,10 @@ import numpy as np
 import pytest
 import torch
 from mlops_project.data import brain_tumor, load_data
+from mlops_project.utils import ensure_data_and_model
 from PIL import Image
+
+MODEL_BUCKET, MODEL_PREFIX, DATA_PREFIX, LOCAL_DATA, LOCAL_MODEL = ensure_data_and_model()
 
 
 @pytest.mark.skipif(not os.path.exists("data/processed/train_images.pt"), reason="Data file not found")

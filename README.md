@@ -1,5 +1,5 @@
 # mlops_project
-
+[Link to project documentation](https://smilladue.github.io/mlops_g53/)
 
 Goal
 

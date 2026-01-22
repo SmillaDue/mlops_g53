@@ -8,13 +8,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy only dependency metadata first (better Docker layer caching)
 WORKDIR /
-COPY uv.lock pyproject.toml README.md LICENSE tasks.py ./ 
 
-# Copy application code
-COPY src/       src/
-COPY configs/   configs/
+# Copy dependency metadata
+COPY uv.lock pyproject.toml README.md LICENSE tasks.py ./
+
+# Copy code
+COPY src/ src/
+COPY configs/ configs/
+
+# Install deps
+RUN uv sync --frozen --no-dev
 
 EXPOSE 8080
 ENTRYPOINT ["uvx", "invoke", "api"]

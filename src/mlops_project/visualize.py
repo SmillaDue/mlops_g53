@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 
 import hydra
@@ -10,55 +11,27 @@ from omegaconf import DictConfig
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
+from mlops_project.utils import ensure_data_and_model
 from wandb import config
 
-matplotlib.use("Agg")  # headless backend for file output only
+IS_LINUX = sys.platform.startswith("linux")
+if IS_LINUX:
+    # Use a headless backend (no display required)
+    import matplotlib
+
+    matplotlib.use("Agg")
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
-MODEL_BUCKET = "mlops-brain-tumor"
-MODEL_OBJECT = "models/model.pth"
+# import subprocess
 
-MODEL_PREFIX = "models/model.pth"
-DATA_PREFIX = "data"  # folder in the bucket
-
-LOCAL_DATA = Path(DATA_PREFIX) / "processed"
-LOCAL_MODEL = Path(MODEL_PREFIX)
-
-
-def ensure_data():
-    client = storage.Client()
-    bucket = client.bucket(MODEL_BUCKET)
-
-    # Ensure local folder exists
-    LOCAL_DATA.mkdir(parents=True, exist_ok=True)
-
-    # --- Download model ---
-    if not LOCAL_MODEL.exists():
-        blob = bucket.blob(MODEL_PREFIX)
-        blob.download_to_filename(str(LOCAL_MODEL))
-
-    # --- Download all data files ---
-    blobs = bucket.list_blobs(prefix=DATA_PREFIX)
-
-    for blob in blobs:
-        # Skip "directory" placeholders
-        if blob.name.endswith("/"):
-            continue
-
-        local_path = LOCAL_DATA / Path(blob.name).name
-        if local_path.exists():
-            continue
-
-        blob.download_to_filename(str(local_path))
-
-
-ensure_data()
+# LOCAL_MODEL = Path("models/model.pth")
 
 
 @hydra.main(config_path="../../configs", config_name="default_config.yaml", version_base=None)
 def visualize(config: DictConfig) -> None:
     """Visualize model predictions."""
+
     figure_name: str = "embeddings.png"
     model_checkpoint: Path = LOCAL_MODEL
 
@@ -100,11 +73,9 @@ def visualize(config: DictConfig) -> None:
         plt.scatter(embeddings[mask, 0], embeddings[mask, 1], label=str(i))
     plt.legend()
     plt.savefig(f"reports/figures/{figure_name}")
-<<<<<<< HEAD
     plt.close()
-=======
->>>>>>> main
 
 
 if __name__ == "__main__":
+    MODEL_BUCKET, MODEL_PREFIX, DATA_PREFIX, LOCAL_DATA, LOCAL_MODEL = ensure_data_and_model()
     visualize()
