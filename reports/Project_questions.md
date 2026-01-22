@@ -339,9 +339,9 @@ Link to trained model docker file: https://console.cloud.google.com/artifacts/do
 > *Debugging method was dependent on group member. Some just used ... and others used ... . We did a single profiling*
 > *run of our main code at some point that showed ...*
 >
-> Answer: 
+> Answer: Shame on us, but we mostly relied on the very much loved print statements when debugging, and we do not regret it ;) They were helpful for quickly understanding what was happening in the code and for identifying where things went wrong. That said, in the future it would definitely be more well-mannered to use the built-in Python debugger or IDE debugging tools, especially as the project grows in complexity.
+We also used a profiler, and based on the results we changed our data preprocessing pipeline. Instead of loading all data at once, we refactored the code to work in batches. This improved memory usage and made the training process more efficient overall.
 
---- question 16 fill here ---
 
 ## Working in the cloud
 
