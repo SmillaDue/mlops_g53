@@ -7,12 +7,14 @@ from fastapi.testclient import TestClient
 from mlops_project.api import app
 
 
-@pytest.fixture(autouse=True)
+
+@pytest.fixture(autouse=True, scope='session')
 def clean_generated_images():
     """
     Ensure that image artifacts created by the API
     do not leak between tests.
     """
+    app.LOCAL_MODEL.parent.mkdir(parents=True, exist_ok=True)
     Path("image.png").unlink(missing_ok=True)
     Path("image_preprocessed.png").unlink(missing_ok=True)
 
