@@ -7,12 +7,20 @@ from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_sc
 
 import wandb
 from mlops_project.data import brain_tumor
+from utils import ensure_data_and_model
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
-import subprocess
+# import subprocess
+# subprocess.run(["dvc", "pull", "data"], check=True)
 
-subprocess.run(["dvc", "pull"], check=True)
+MODEL_BUCKET = "mlops-brain-tumor"
+
+MODEL_PREFIX = "models/final_model.pth"
+DATA_PREFIX = "data"  # folder in the bucket
+
+LOCAL_DATA = Path(DATA_PREFIX) / "processed"
+LOCAL_MODEL = Path(MODEL_PREFIX)
 
 
 @hydra.main(config_path="../../configs", config_name="default_config.yaml", version_base=None)
@@ -34,6 +42,8 @@ def train(config: DictConfig) -> None:
     Returns:
         None. Saves model to models/model.pth and logs metrics to W&B if enabled.
     """
+    MODEL_BUCKET, MODEL_PREFIX, DATA_PREFIX, LOCAL_DATA, LOCAL_MODEL = ensure_data_and_model()
+    
     print("Training day and night;)")
     print(f"Using device: {DEVICE}")
 
@@ -216,4 +226,5 @@ def train(config: DictConfig) -> None:
 
 
 if __name__ == "__main__":
+    MODEL_BUCKET, MODEL_PREFIX, DATA_PREFIX, LOCAL_DATA, LOCAL_MODEL = ensure_data_and_model()
     train()

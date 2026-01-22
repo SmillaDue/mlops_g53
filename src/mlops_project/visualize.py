@@ -13,6 +13,8 @@ from sklearn.manifold import TSNE
 
 from wandb import config
 
+from mlops_project.utils import ensure_data_and_model
+
 IS_LINUX = sys.platform.startswith("linux")
 if IS_LINUX:
     # Use a headless backend (no display required)
@@ -22,17 +24,14 @@ if IS_LINUX:
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
-import subprocess
+# import subprocess
 
-subprocess.run(["dvc", "pull"], check=True)
-
-
-LOCAL_MODEL = Path("models/model.pth")
-
+# LOCAL_MODEL = Path("models/model.pth")
 
 @hydra.main(config_path="../../configs", config_name="default_config.yaml", version_base=None)
 def visualize(config: DictConfig) -> None:
     """Visualize model predictions."""
+    
     figure_name: str = "embeddings.png"
     model_checkpoint: Path = LOCAL_MODEL
 
@@ -78,4 +77,5 @@ def visualize(config: DictConfig) -> None:
 
 
 if __name__ == "__main__":
+    MODEL_BUCKET, MODEL_PREFIX, DATA_PREFIX, LOCAL_DATA, LOCAL_MODEL = ensure_data_and_model()
     visualize()

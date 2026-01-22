@@ -7,6 +7,43 @@ import numpy as np
 import torch
 from monai.transforms import ScaleIntensity
 
+from google.cloud import storage
+from pathlib import Path
+
+def ensure_data_and_model():
+    MODEL_BUCKET = "mlops-brain-tumor"
+
+    MODEL_PREFIX = "models/final_model.pth"
+    DATA_PREFIX = "data"  # folder in the bucket
+
+    LOCAL_DATA = Path(DATA_PREFIX) / "processed"
+    LOCAL_MODEL = Path(MODEL_PREFIX)
+    
+    client = storage.Client()
+    bucket = client.bucket(MODEL_BUCKET)
+
+    # Ensure local folder exists
+    LOCAL_DATA.mkdir(parents=True, exist_ok=True)
+
+    # --- Download model ---
+    if not LOCAL_MODEL.exists():
+        blob = bucket.blob(MODEL_PREFIX)
+        blob.download_to_filename(str(LOCAL_MODEL))
+
+    # --- Download all data files ---
+    blobs = bucket.list_blobs(prefix=DATA_PREFIX)
+
+    for blob in blobs:
+        # Skip "directory" placeholders
+        if blob.name.endswith("/"):
+            continue
+
+        local_path = LOCAL_DATA / Path(blob.name).name
+        if local_path.exists():
+            continue
+
+        blob.download_to_filename(str(local_path))
+    return MODEL_BUCKET, MODEL_PREFIX, DATA_PREFIX, LOCAL_DATA, LOCAL_MODEL
 
 def show_image_and_target(images, targets, show=True):
     """Display images with their corresponding targets in a single grid."""

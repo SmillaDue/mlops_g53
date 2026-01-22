@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import subprocess
 import base64
 import os
 import re
@@ -22,14 +23,10 @@ from pydantic import BaseModel
 
 from mlops_project.utils import ArrayPreprocessing, TensorsPreprocessing
 
-PROJECT_ROOT = Path(os.getcwd())  # adjust if needed
-CONFIG_DIR = PROJECT_ROOT / "configs/"  # where the yaml's are
-MODEL_BUCKET = "mlops-brain-tumor"
-MODEL_OBJECT = "models/final_model.pth"
-LOCAL_MODEL = Path("/tmp/model.pth")
-
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
+PROJECT_ROOT = Path(os.getcwd())  # adjust if needed
+CONFIG_DIR = PROJECT_ROOT / "configs/"  # where the yaml's are
 
 def ensure_model():
     """
@@ -38,6 +35,10 @@ def ensure_model():
     If the model file is not present at LOCAL_MODEL, it is downloaded
     from the configured Google Cloud Storage bucket.
     """
+    MODEL_BUCKET = "mlops-brain-tumor"
+    MODEL_OBJECT = "models/final_model.pth"
+    LOCAL_MODEL = Path("/tmp/model.pth")
+
     if LOCAL_MODEL.exists():
         return
 
@@ -45,7 +46,6 @@ def ensure_model():
     bucket = client.bucket(MODEL_BUCKET)
     blob = bucket.blob(MODEL_OBJECT)
     blob.download_to_filename(str(LOCAL_MODEL))
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

@@ -8,15 +8,13 @@ from omegaconf import DictConfig
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
 from mlops_project.data import brain_tumor
+from mlops_project.utils import ensure_data_and_model
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
 
-import subprocess
-
-subprocess.run(["dvc", "pull"], check=True)
-
-LOCAL_MODEL = Path("models/model.pth")
-
+# import subprocess
+# subprocess.run(["dvc", "pull"], check=True)
+# LOCAL_MODEL = Path("models/model.pth"
 
 @hydra.main(config_path="../../configs", config_name="default_config.yaml", version_base=None)
 def evaluate(config: DictConfig) -> None:
@@ -72,4 +70,5 @@ def evaluate(config: DictConfig) -> None:
 
 
 if __name__ == "__main__":
+    MODEL_BUCKET, MODEL_PREFIX, DATA_PREFIX, LOCAL_DATA, LOCAL_MODEL = ensure_data_and_model()
     evaluate()

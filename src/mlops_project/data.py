@@ -5,15 +5,16 @@ from pathlib import Path
 import torch
 from google.cloud import storage
 
-from mlops_project.utils import ArrayPreprocessing, TensorsPreprocessing
+from mlops_project.utils import ArrayPreprocessing, TensorsPreprocessing, ensure_data_and_model
 
-subprocess.run(["dvc", "pull"], check=True)
+# subprocess.run(["dvc", "pull", "data"], check=True)
+
+MODEL_BUCKET, MODEL_PREFIX, DATA_PREFIX, LOCAL_DATA, LOCAL_MODEL = ensure_data_and_model()
 
 # hyperparameter
 IMG_SIZE = 256
 
 BASE_DIR = Path(os.environ.get("DATA_DIR", "data/processed"))
-
 
 #### Load training data ######
 def load_data(raw_data_dir: str):
