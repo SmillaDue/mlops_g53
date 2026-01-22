@@ -14,7 +14,7 @@ import cv2
 import hydra
 import torch
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile
-from fastapi.responses import FileResponse, JSONResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from google.cloud import storage
 from hydra import compose, initialize_config_dir
 from hydra.core.global_hydra import GlobalHydra
@@ -75,6 +75,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
 
 @app.get("/", response_class=HTMLResponse)
 def read_root():
@@ -142,7 +143,6 @@ def read_root():
     """
 
 
-
 @app.post("/inference/")
 async def inference(
     request: Request,
@@ -150,9 +150,9 @@ async def inference(
 ):
     """
     API for inference
-    
+
     POST: Post image and get class probabilites back.
-    
+
     Internally the uploaded image is:
     - transformed/preprocessed the same way the raw data was processed for the training set
     - loads a trained model
@@ -189,11 +189,11 @@ async def inference(
     model.eval()
 
     with torch.no_grad():
-        logits = model(img_final.to(DEVICE))          # ensure on same device as model
-        probs = torch.softmax(logits, dim=1)          # (B, C)
-        probs = probs.squeeze(0).cpu().tolist()       # (C,) -> python list
+        logits = model(img_final.to(DEVICE))  # ensure on same device as model
+        probs = torch.softmax(logits, dim=1)  # (B, C)
+        probs = probs.squeeze(0).cpu().tolist()  # (C,) -> python list
 
-    labels = ['glioma', 'meningioma', 'notumor', 'pituitary']
+    labels = ["glioma", "meningioma", "notumor", "pituitary"]
 
     class_probs = {label: float(prob) for label, prob in zip(labels, probs)}
     class_probs = dict(sorted(class_probs.items(), key=lambda x: x[1], reverse=True))
