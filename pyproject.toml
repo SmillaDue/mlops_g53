@@ -38,11 +38,7 @@ dependencies = [
     "python-multipart>=0.0.21",
     "scikit-learn>=1.8.0",
     "snakeviz>=2.2.2",
-<<<<<<< HEAD
-    "torch>=2.6.0",
-=======
     "torch==2.6.0",
->>>>>>> main
     "torchvision>=0.21.0",
     "typer==0.21.1",
     "uvicorn==0.34.0",
