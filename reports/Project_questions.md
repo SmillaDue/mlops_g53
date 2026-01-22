@@ -267,9 +267,8 @@ Another important use case is collaborative work. When multiple team members mod
 > Example:
 > *We used a simple argparser, that worked in the following way: Python  my_script.py --lr 1e-3 --batch_size 25*
 >
-> Answer:
+> Answer: We configured our experiments using Hydra-based configuration files. A default configuration defines global settings such as logging and training parameters, which is then composed with separate training and model-specific configuration files. This allows us to easily switch models or adjust hyperparameters without changing the training code. Experiments can be run by overriding configuration values.
 
---- question 12 fill here ---
 
 ### Question 13
 
@@ -301,9 +300,13 @@ During training, step-level, epoch-level, and final performance metrics are logg
 > *As seen in the second image we are also tracking ... and ...*
 >
 > Answer:
-> ![Example Sweep](../figures/sweep.png)
+> In the first image you could see an overview of the sweep. Here it is a very basic one mainly observing the batch size and learning rate.
+> ![Example Sweep](/reports/figures/sweep.png )
+> In the next picutre you can see that we also track the loss value of our training. This one is for our best sweep run from above.
+>![Example Sweep](/reports/figures/loss.png )
+> In the last figure, we report the model’s accuracy on the test dataset using the best-performing sweep configuration.
+> ![Example Sweep](/reports/figures/accuracy.png )
 
---- question 14 fill here ---
 
 ### Question 15
 
@@ -316,7 +319,12 @@ During training, step-level, epoch-level, and final performance metrics are logg
 > *For our project we developed several images: one for training, inference and deployment. For example to run the*
 > *training docker image: `docker run trainer:latest lr=1e-3 batch_size=64`. Link to docker file: <weblink>*
 >
-> Answer:
+> Answer: Docker was used in our project to containerize different parts of the machine-learning pipeline. We created Docker images for training the model so that the training process and dependencies were consistent and reproducible across machines. The trained model was saved and included in a Docker image, making it easy to share and deploy the model.
+We also used Docker to build images for an API that serves the model in the cloud. This API was implemented using FastAPI and Uvicorn and deployed using Cloud Run. As the project developed, Docker images were rebuilt and updated automatically using Cloud Build through configuration files such as cloudbuild.yaml. This allowed the API and model to be updated continuously when changes were made to the code.
+Docker images were built using docker build and run locally with docker run, including port mapping and environment variables when required.
+
+Link to trained model docker file: https://console.cloud.google.com/artifacts/docker/mlops-g53/europe-west1/mlops-g53-repo/wandb?project=mlops-g53
+
 
 --- question 15 fill here ---
 
@@ -331,7 +339,7 @@ During training, step-level, epoch-level, and final performance metrics are logg
 > *Debugging method was dependent on group member. Some just used ... and others used ... . We did a single profiling*
 > *run of our main code at some point that showed ...*
 >
-> Answer:
+> Answer: 
 
 --- question 16 fill here ---
 
@@ -348,7 +356,13 @@ During training, step-level, epoch-level, and final performance metrics are logg
 > Example:
 > *We used the following two services: Engine and Bucket. Engine is used for... and Bucket is used for...*
 >
-> Answer:
+> Answer: We used the following: 
+Cloud run functions : To create and Setup functions/models in the cloud as an API.
+Cloud build : To build into containers or artifacts in the cloud, which was build when we create a new cloud function 
+Buckets: Buckets are online storage for data, which we used to save both out trainining and test data. 
+Cloud Engine : Cloud Engine is an online service which makes it possible to train your model on another computer. This we used to train our model  
+Artifacts : Artifacts is a place to create repositories where you can store docker images for your API’s or models, which we also did. 
+Storage : We used buckets, which is a part of the cloud storage service. 
 
 --- question 17 fill here ---
 
@@ -373,6 +387,11 @@ During training, step-level, epoch-level, and final performance metrics are logg
 > **You can take inspiration from [this figure](figures/bucket.png).**
 >
 > Answer:
+>
+> ![Bucket_snapshot](/reports/figures/gcp_bucket1.png )
+>
+> ![Bucket_snapshot](/reports/figures/gcp_bucket2.png )
+> 
 
 --- question 19 fill here ---
 
@@ -382,6 +401,9 @@ During training, step-level, epoch-level, and final performance metrics are logg
 > **stored. You can take inspiration from [this figure](figures/registry.png).**
 >
 > Answer:
+> ![artifacts_snapshot](/reports/figures/gcp_artifacts_screenshot1.png )
+>
+> ![artifacts_snapshot](/reports/figures/gcp_artifacts_screenshot2.png )
 
 --- question 20 fill here ---
 
@@ -391,6 +413,9 @@ During training, step-level, epoch-level, and final performance metrics are logg
 > **your project. You can take inspiration from [this figure](figures/build.png).**
 >
 > Answer:
+>
+> ![build_snapshot](/reports/figures/Build_history.png )
+> 
 
 --- question 21 fill here ---
 
@@ -422,7 +447,8 @@ During training, step-level, epoch-level, and final performance metrics are logg
 > *We did manage to write an API for our model. We used FastAPI to do this. We did this by ... . We also added ...*
 > *to the API to make it more ...*
 >
-> Answer:
+> Answer: Yes, we managed to create an API for our model. We implemented the API using the FastAPI framework. The API loads the weights of the final trained model from a cloud bucket, which allows the model to be accessed without storing the weights locally in the application. We then defined an inference function and decorated it with @app.post("/inference"). This endpoint takes an image uploaded by the user as input. The image is first saved and then preprocessed so that it matches the input format expected by the model. After preprocessing, the image is passed through the model to generate predictions. The API then returns the class probabilities as the output, representing the model’s confidence for each class. In addition, the response includes a URL pointing to the processed image.
+
 
 --- question 23 fill here ---
 
@@ -438,7 +464,18 @@ During training, step-level, epoch-level, and final performance metrics are logg
 > *worked. Afterwards we deployed it in the cloud, using ... . To invoke the service an user would call*
 > *`curl -X POST -F "file=@file.json"<weburl>`*
 >
-> Answer:
+> Answer: Yes we managed to deploy both an API based on a docker image and another using cloud functions. The one using a docker image was made by using our API described in question 23. An API dockerfile was created which runs the model and sets up the API with the fastapi framework on port 8080. For Setting it up on the cloud, we made a cloudbuild.yaml file, which constructs the container image and deploys it to cloud run with the relevans Settings. 
+The API deployer without an image was deployed with the cloud run functions by Setting up a main.py file and a requirements.txt file. It works on the same model as the one build on the docker image, but returns the argmax of the class probabilities. 
+
+To invoke the service you would execute 
+
+Image API: 
+curl -X POST "https://brain-inference-api-via-functions-124059837854.europe-west1.run.app" \
+ - F "file=<path to image file>” 
+
+Functions API: 
+curl -X POST "https://europe-west1-mlops-g53.cloudfunctions.net/brain-inference-api-via-functions" \
+ - F "file=<path to image file>” 
 
 --- question 24 fill here ---
 
