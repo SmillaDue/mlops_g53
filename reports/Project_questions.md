@@ -505,9 +505,9 @@ curl -X POST "https://europe-west1-mlops-g53.cloudfunctions.net/brain-inference-
 > *We did not manage to implement monitoring. We would like to have monitoring implemented such that over time we could*
 > *measure ... and ... that would inform us about this ... behaviour of our application.*
 >
-> Answer:
+> Answer: We implemented monitoring for our deployed model using Google Cloud Run and Google Cloud Monitoring. Cloud Run automatically provides system-level metrics such as request count, request latency, CPU utilization, memory usage, and HTTP response codes. These built-in metrics allow us to monitor the health and performance of the deployed inference API without adding additional instrumentation code.
+Based on these metrics, we configured alerting policies in Google Cloud Monitoring. One alert triggers when server-side errors (HTTP 5xx responses) occur, indicating that the application is not behaving correctly. A second alert monitors the request latency using the p95 percentile and is triggered when the response time exceeds 1 second, which may occur under high load or performance degradation.
 
---- question 26 fill here ---
 
 ## Overall discussion of project
 
