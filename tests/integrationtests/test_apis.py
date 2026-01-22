@@ -1,9 +1,11 @@
+from pathlib import Path
+
+import cv2  # uses the same backend as the API
+import numpy as np
 import pytest
 from fastapi.testclient import TestClient
-from pathlib import Path
 from mlops_project.api import app
-import numpy as np
-import cv2  # uses the same backend as the API
+
 
 @pytest.fixture(autouse=True)
 def clean_generated_images():
@@ -19,6 +21,7 @@ def clean_generated_images():
     Path("image.png").unlink(missing_ok=True)
     Path("image_preprocessed.png").unlink(missing_ok=True)
 
+
 def _make_png_bytes(size: int = 16) -> bytes:
     """
     Create a small valid PNG image as bytes (no PIL dependency).
@@ -29,6 +32,7 @@ def _make_png_bytes(size: int = 16) -> bytes:
     assert ok
     return bytes(buf)
 
+
 def test_root_returns_html():
     with TestClient(app) as client:
         resp = client.get("/")
@@ -36,13 +40,15 @@ def test_root_returns_html():
         assert "Model Inference API" in resp.text
         assert "POST /inference/" in resp.text
 
+
 def test_get_preprocessed_image_not_found():
     with TestClient(app) as client:
         # Ensure the file doesn't exist
         resp = client.get("/inference/image_preprocessed.png")
         assert resp.status_code == 404
         assert resp.json()["detail"] == "Preprocessed image not found"
-    
+
+
 def test_inference_rejects_invalid_image():
     with TestClient(app) as client:
         # Not an image -> cv2.imread should return None -> 400
@@ -50,6 +56,7 @@ def test_inference_rejects_invalid_image():
         resp = client.post("/inference/", files=files)
         assert resp.status_code == 400
         assert resp.json()["detail"] == "Invalid image"
+
 
 def test_inference_success_and_preprocessed_image_available():
     with TestClient(app) as client:
