@@ -8,7 +8,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-# Use a real project directory (NOT /)
 WORKDIR /
 
 # Copy dependency metadata

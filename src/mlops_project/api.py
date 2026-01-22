@@ -14,7 +14,7 @@ import cv2
 import hydra
 import torch
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, HTMLResponse
 from google.cloud import storage
 from hydra import compose, initialize_config_dir
 from hydra.core.global_hydra import GlobalHydra
@@ -28,6 +28,10 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.ba
 PROJECT_ROOT = Path(os.getcwd())  # adjust if needed
 CONFIG_DIR = PROJECT_ROOT / "configs/"  # where the yaml's are
 
+MODEL_BUCKET = "mlops-brain-tumor"
+MODEL_OBJECT = "models/final_model.pth"
+LOCAL_MODEL = Path("/tmp/model.pth")
+
 
 def ensure_model():
     """
@@ -36,9 +40,6 @@ def ensure_model():
     If the model file is not present at LOCAL_MODEL, it is downloaded
     from the configured Google Cloud Storage bucket.
     """
-    MODEL_BUCKET = "mlops-brain-tumor"
-    MODEL_OBJECT = "models/final_model.pth"
-    LOCAL_MODEL = Path("/tmp/model.pth")
 
     if LOCAL_MODEL.exists():
         return
@@ -75,28 +76,71 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 def read_root():
     """
     Root endpoint and health check.
 
     Returns a short description of the service and how to use it.
     """
-    return {
-        "service": "Model Inference API",
-        "status": "ok",
-        "description": (
-            "This API performs image classification using a trained PyTorch model.\n\n"
-            "Usage:\n"
-            "POST /inference/\n"
-            "  - multipart/form-data with a single file field named `data`\n"
-            "  - the file must be an image\n\n"
-            "The response contains the model's class probabilities.\n"
-            "You can also retrieve the preprocessed image at:\n"
-            "GET /inference/image_preprocessed.png"
-        ),
-    }
+    return """
+    <html>
+        <head>
+            <title>Model Inference API</title>
+            <style>
+                body {
+                    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+                    margin: 2rem;
+                    line-height: 1.6;
+                }
+                h1 {
+                    color: #2c3e50;
+                }
+                code {
+                    background: #f4f4f4;
+                    padding: 0.2em 0.4em;
+                    border-radius: 4px;
+                }
+                .box {
+                    background: #fafafa;
+                    border: 1px solid #ddd;
+                    padding: 1rem;
+                    border-radius: 6px;
+                    max-width: 700px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="box">
+                <h1>Model Inference API</h1>
+                <p>Status: <strong>ok</strong></p>
+
+                <p>
+                    This API performs image classification using the final model
+                    trained on the brain tumor dataset.
+                </p>
+
+                <h2>Usage</h2>
+                <p>
+                    <code>POST /inference/</code><br/>
+                    - multipart/form-data with a single file field named <code>data</code><br/>
+                    - the file must be an image
+                </p>
+
+                <p>
+                    The response contains the model's class probabilities.
+                </p>
+
+                <h2>Extras</h2>
+                <p>
+                    Retrieve the preprocessed image at:<br/>
+                    <code>GET /inference/image_preprocessed.png</code>
+                </p>
+            </div>
+        </body>
+    </html>
+    """
+
 
 
 @app.post("/inference/")
@@ -105,15 +149,16 @@ async def inference(
     data: UploadFile = File(...),
 ):
     """
-    API does inference by
-    1. User uploads an image for inference
-
-    Then the following is executed:
-
-    2. transform/preprocess the uploaded image
-    3. load in a model
-    4. predict
-    5. return pct for each class? just the class? Depends on the intended user.
+    API for inference
+    
+    POST: Post image and get class probabilites back.
+    
+    Internally the uploaded image is:
+    - transformed/preprocessed the same way the raw data was processed for the training set
+    - loads a trained model
+    - forwards the image
+    - converts the output to class probabilites
+    - returns the class probabilites
     """
 
     config = request.app.state.cfg
@@ -144,13 +189,20 @@ async def inference(
     model.eval()
 
     with torch.no_grad():
-        y_pred = model(img_final).cpu()
+        logits = model(img_final.to(DEVICE))          # ensure on same device as model
+        probs = torch.softmax(logits, dim=1)          # (B, C)
+        probs = probs.squeeze(0).cpu().tolist()       # (C,) -> python list
 
-    pred = y_pred.softmax(dim=1).tolist()
+    labels = ['glioma', 'meningioma', 'notumor', 'pituitary']
+
+    class_probs = {label: float(prob) for label, prob in zip(labels, probs)}
+    class_probs = dict(sorted(class_probs.items(), key=lambda x: x[1], reverse=True))
+
+    pred_label = max(class_probs, key=class_probs.get)
 
     return {
-        "prediction": pred,
-        "image_url": "/inference/image_preprocessed.png",
+        "prediction": pred_label,
+        "probabilities": class_probs,
     }
 
 
