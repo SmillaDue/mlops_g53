@@ -1,0 +1,24 @@
+import pandas as pd
+from evidently.legacy.metric_preset import DataDriftPreset
+from evidently.legacy.report import Report
+from evidently.legacy.metric_preset import DataDriftPreset, DataQualityPreset, TargetDriftPreset
+
+
+feature_columns = ["avg_brightness", "contrast", "sharpness"]
+
+
+reference_data = pd.read_csv("data_api/reference_features.csv")[feature_columns]
+current_data = pd.read_csv("data_api/inference_features.csv")[feature_columns]
+
+report = Report(metrics=[DataDriftPreset(), DataQualityPreset(), TargetDriftPreset()])
+report.run(reference_data=reference_data, current_data=current_data)
+report.save_html("data_drift.html")
+
+from evidently.legacy.tests import TestNumberOfMissingValues
+from evidently.legacy.test_suite import TestSuite
+data_test = TestSuite(tests=[TestNumberOfMissingValues()])
+data_test.run(reference_data=reference_data, current_data=current_data)
+result = data_test.as_dict()
+print(result)
+print("All tests passed: ", result['summary']['all_passed'])
+

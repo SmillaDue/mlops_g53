@@ -1,0 +1,19 @@
+defaults:
+    - _self_
+    - model: densenet  # options: smallcnn, deepcnn, densenet
+    - training_conf
+
+# glocbal model parameters
+num_classes: 4
+in_channels: 1
+
+wandb:
+  enabled: true
+  project: smallcnn
+  entity: brainy_mlops
+  name: densenet_param_1
+  tags: []
+  log_every: 50
+  log_model: true
+
+max_steps: -1
