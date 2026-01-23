@@ -557,7 +557,10 @@ Based on these metrics, we configured alerting policies in Google Cloud Monitori
 >
 > Answer:
 >
-> S243656 has used 14% of their credit. 
+> S243656 has used 14% of their credit.
+>
+> Working in the cloud is very nice because you can just submit your code or let the training begin and Forget about it. This is one of the main positives of working in the cloud. Another great feature of the cloud is the storage availability which can add complications to computers with low available storage space. The cloud build service gave very usefull information for debugging when Setting up both images and models. We did however experience that working on the cloud could sometimes be more slow than running locally. 
+All in all it brings a lot of quality of life features for deployment and training of machine learning projects. 
 
 --- question 27 fill here ---
 
