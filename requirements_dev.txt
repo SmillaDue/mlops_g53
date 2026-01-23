@@ -594,7 +594,7 @@ snakeviz==2.2.2
     # via mlops-project (pyproject.toml)
 sqltrie==0.11.2
     # via dvc-data
-starlette==0.41.3
+starlette==0.52.1
     # via fastapi
 sympy==1.13.1
     # via torch
