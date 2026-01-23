@@ -631,6 +631,7 @@ We overcame the most challenges by first trying to follow the steps in the cours
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
 >
-> s243656: Contributed and helped with Setting ud data extraction, API Setup in the cloud, dockerfiles and data monitoring with evidently. Used ChatGPT for debugging and code skeletons as well as copilot mainly for debugging.  
+> s243656: Contributed and helped with Setting ud data extraction, API Setup in the cloud, dockerfiles and data monitoring with evidently. Used ChatGPT for debugging and code skeletons as well as copilot mainly for debugging.
+> s252263: Focused on the model and bringing the training to the GCP including creating an wokring dockerfile. Also setup logging and config files for the runs and integrated some basic alerting.
 
 some text
