@@ -221,7 +221,7 @@ The model test makes sure the model can run with different batch sizes and that 
 >
 > Answer: 
 
-The total code coverage of the report is 26%, which includes all our source code. The tests are for loading and preprocessing data, model testing, and tests for the utility functions. Code coverage is a good indicator that the code has been tested, but is a measure of how many lines of code we run when executing the unittests, and therefore not guarantee error free code. There could be edge cases that one does not account for when doing unittests.
+The total code coverage of the report is 26%, which includes all our source code. The tests are for loading and preprocessing data, model testing, and tests for the utility functions. Code coverage is a good indicator that the code has been tested, but is a measure of how many lines of code we run when executing the unittests, and therefore not guarantee error free code. There could be edge cases that one does not account for when doing unittests. For example, integration issues, unexpected inputs, or changes in the runtime environment can still cause failures even when most lines of code are covered by tests.
 
 ### Question 9
 
@@ -269,7 +269,11 @@ Another important use case is collaborative work. When multiple team members mod
 >
 > Answer: 
 
-Our continuous integration setup uses GitHub Actions to automatically run code linting and unit tests on every push and pull request to the main branch. The workflows execute ruff-based linting and formatting checks as well as pytest-based unit tests with coverage across multiple operating systems (Linux, Windows, and macOS) using a fixed Python version, with dependency caching enabled to speed up execution.
+Our continuous integration and deployment pipeline is implemented using GitHub Actions and is organized into five main workflows: code linting and formatting, automated unit and integration testing, scheduled pre-commits, continuous documentation deployment, and automated Docker image builds for deployment.
+For liniting, we used a workflow that runs on ruff. This workflow is executed across a matrix of operating systems (Ubuntu, Windows, and macOS) and a fixed Python version (3.13) to ensure cross-platform compatibility. Dependencies are managed using uv, and caching is enabled to speed up repeated runs by reusing previously installed packages.
+Testing is handled in a separate workflow that also runs on multiple operating systems and Python 3.13. It installs dependencies using uv, retrieves versioned data via DVC, and securely injects Google Cloud credentials from GitHub Secrets for tests that require cloud access. The workflow runs both unit tests with coverage and a set of integration tests to make sure the system works as expected.
+We also have a scheduled workflow that updates our pre-commit hooks every day and creates a pull request with the newest tool versions. Our documentation is automatically deployed using MkDocs and GitHub Pages whenever we push to the main branch.
+Finally, we automatically build Docker images for our API service and model training whenever changes are pushed to GitHub. These images are pushed to our google cloud artifacts registry. 
 
 [Linting workflow](https://github.com/SmillaDue/mlops_g53/actions/runs/21037845125/workflow)
 [Unit test workflow](https://github.com/SmillaDue/mlops_g53/actions/runs/21183711060/workflow)
@@ -332,6 +336,10 @@ In the next picutre you can see that we also track the loss value of our trainin
 ![Example Sweep](figures/loss.png)
 In the last figure, we report the model’s accuracy on the test dataset using the best-performing sweep configuration.
 ![Example Sweep](figures/accuracy.png)
+
+We track a combination of hyperparameters and performance metrics. We do this to be able to optimize the hyper parameters in regards of the performance metrics. On the hyperparameter side, we log batch size, device, number of epochs, model type, whether the model is pretrained, learning rate, optimizer (e.g., Adam or AdamW), weight decay, and random seed. These values are essential for understanding how different configurations influence training stability, convergence speed, and final performance, but also for ensuring reproducibility.
+For model performance, we monitor training and validation loss to assess how well the model is learning and to detect issues such as underfitting or overfitting. A decreasing training loss combined with stable and low validation loss indicates that it might generalize well, while a big difference between the two can signal overfitting.
+We also track accuracy, precision, recall, and F1 score on the training and validation sets. Accuracy provides an overall performance measure, where precision and recall give insight to the model’s behavior on individual classes. Finally, we can test and report the test accuracy using the best-performing sweep configuration to provide a more generalizable and reliable result.
 
 
 ### Question 15
@@ -638,8 +646,12 @@ We overcame the most challenges by first trying to follow the steps in the cours
 > *All members contributed to code by...*
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
->
-> s243656: Contributed and helped with Setting ud data extraction, API Setup in the cloud, dockerfiles and data monitoring with evidently. Used ChatGPT for debugging and code skeletons as well as copilot mainly for debugging.
-> s252263: Focused on the model and bringing the training to the GCP including creating an wokring dockerfile. Also setup logging and config files for the runs and integrated some basic alerting.
 
-some text
+s243656: Contributed and helped with Setting ud data extraction, API Setup in the cloud, dockerfiles and data monitoring with evidently. Used ChatGPT for debugging and code skeletons as well as copilot mainly for debugging.
+s252263: Focused on the model and bringing the training to the GCP including creating an wokring dockerfile. Also setup logging and config files for the runs and integrated some basic alerting.
+s204153: Were in charge of many of the initial week 1 tasks regarding setting up Github, Cookiecutter, initial Hydra setup, pep8 code formatting, linting checks, trigger docker build etc. Furthermore, focused on training the model, hyper-parameter sweep tracked on W&B and training on Vertex AI, and documenting the project (mkdocs + architectural diagram).
+s243659: Contributed by handeling much of the data preprocessing, and setting up dvc and data in the cloud bucket. Furthermore, were in charge of profiling, unit-tests, code coverage and also contributed to the API setup. 
+
+We had a very good team-work, were each member contributed equally - and while some were in charge of some areas, everyone helped out when there were issues, and sometimes we also coded together. 
+
+We have used generative AI (chatGPT and Github Copilot), if we were stuck in a difficult task, or to help out with errors that we couldn't solve or directly understand from the error messages. Additionaly, we used GitHub Copilot to help format our code, so that we adhered to good coding pratices. 
