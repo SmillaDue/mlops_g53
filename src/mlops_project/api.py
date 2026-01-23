@@ -30,7 +30,13 @@ CONFIG_DIR = PROJECT_ROOT / "configs/"  # where the yaml's are
 
 MODEL_BUCKET = "mlops-brain-tumor"
 MODEL_OBJECT = "models/final_model.pth"
-LOCAL_MODEL = Path("/tmp/model.pth")
+# LOCAL_MODEL = Path("/tmp/model.pth")
+
+if os.name == "nt":  # Windows
+    LOCAL_MODEL = Path(os.environ["TEMP"]) / "model.pth"
+else:  # macOS / Linux
+    LOCAL_MODEL = Path("/tmp/model.pth")
+
 
 
 def ensure_model():

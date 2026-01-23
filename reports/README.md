@@ -204,7 +204,7 @@ These concepts matter greatly in larger projects because they make the codebase 
 >
 > Answer: 
 
-We implemented tests, which make sure that both the data and the model runs smoothly every time we push something new into the project. It runs both pytests and coverage. 
+We implemented 11 tests, which make sure that both the data and the model runs smoothly every time we push something new into the project. It runs both pytests and coverage. 
 For the data it does: check dataset loads correctly, verify the number og samples in training and test set, validate that each image is a 3d tensor in correct format and ensures correct label format. 
 The model test makes sure the model can run with different batch sizes and that the output format is correct. 
 
@@ -221,7 +221,7 @@ The model test makes sure the model can run with different batch sizes and that 
 >
 > Answer: 
 
-CAN ONLY BE ANSWERED IN THE END OF PROJECT 
+The total code coverage of the report is 26%, which includes all our source code. The tests are for loading and preprocessing data, model testing, and tests for the utility functions. Code coverage is a good indicator that the code has been tested, but is a measure of how many lines of code we run when executing the unittests, and therefore not guarantee error free code. There could be edge cases that one does not account for when doing unittests.
 
 ### Question 9
 
@@ -248,8 +248,9 @@ Yes, we both made use of both branches and PRs. Everytime we would work on a spe
 > *pipeline*
 >
 > Answer:
-
-In our project, we did not use a data version control system such as DVC because we worked with a single, fixed dataset that did not change throughout the development process. We only did preprocessing in the beginning and also this was the task of only one team member. So the dataset was stable and also relatively small, making manual handling sufficient for our use case.
+In our project, we did setup data version control using DVC for managing data, but was setup late in the process. 
+Since we are using a single fixed benchmark dataset, data version control was not that neccesary, was setup anyway.
+We only did preprocessing in the beginning and also this was the task of only one team member. So the dataset was stable and also relatively small, making manual handling sufficient for our use case.
 However, data version control would become highly beneficial in more complex scenarios, particularly when datasets evolve over time or multiple experiments depend on different data states. When data preprocessing would be a more iterative process it would be very helpful to have some sort of DVC. With that each processed version of the dataset can be versioned and linked to a specific experiment or model. This makes it possible to reproduce results exactly and to compare how changes in the data influence model performance.
 Another important use case is collaborative work. When multiple team members modify or extend a dataset (for example, adding new samples or correcting labels), DVC helps track who changed what and when. 
 
@@ -419,9 +420,8 @@ By using Compute Engine through Vertex AI, virtual machines were created on dema
 >
 > Answer:
 
-![Bucket_snapshot](figures/gcp_bucket1.png)
-![Bucket_snapshot](figures/gcp_bucket2.png)
-
+![bucket_snapshot1](figures/gcp_bucket.PNG)
+![bucket_snapshot2](figures/gcp_bucket2.PNG)
 ### Question 20
 
 > **Upload 1-2 images of your GCP artifact registry, such that we can see the different docker images that you have**
@@ -429,8 +429,8 @@ By using Compute Engine through Vertex AI, virtual machines were created on dema
 >
 > Answer:
 
-![artifacts_snapshot](figures/gcp_artifacts_screenshot1.png)
-![artifacts_snapshot](figures/gcp_artifacts_screenshot2.png)
+![artifacts_snapshot](figures/gcp_artifact_registry.PNG)
+
 
 ### Question 21
 
@@ -455,6 +455,7 @@ By using Compute Engine through Vertex AI, virtual machines were created on dema
 > Answer: 
 
 Yes, we successfully trained our model in the cloud using Vertex AI. The training code was containerized using Docker and executed as a Vertex AI custom job, allowing the model to be trained in a scalable and reproducible cloud environment.
+To train models, do sweeping and building images we created both configuration files and shell scripts.
 Training jobs were submitted using the gcloud ai custom-jobs create command, which referenced a container image stored in Google Artifact Registry. Vertex AI handled the full execution workflow, including starting the container, running the training script, and managing job lifecycle events. All training runs were executed consistently using the same container image and configuration files, ensuring reproducibility across experiments.
 This approach allowed us to run training and hyperparameter sweeps in the cloud without managing virtual machines manually, while still benefiting from cloud scalability and centralized experiment tracking.
 
@@ -474,7 +475,7 @@ This approach allowed us to run training and hyperparameter sweeps in the cloud 
 >
 > Answer: 
 
-Yes, we managed to create an API for our model. We implemented the API using the FastAPI framework. The API loads the weights of the final trained model from a cloud bucket, which allows the model to be accessed without storing the weights locally in the application. We then defined an inference function and decorated it with @app.post("/inference"). This endpoint takes an image uploaded by the user as input. The image is first saved and then preprocessed so that it matches the input format expected by the model. After preprocessing, the image is passed through the model to generate predictions. The API then returns the class probabilities as the output, representing the model’s confidence for each class. In addition, the response includes a URL pointing to the processed image.
+Yes, we managed to create an API for our model. We implemented the API using the FastAPI framework. The API loads the weights of the final trained model from a cloud bucket, which allows the model to be accessed without storing the weights locally in the application. We then defined an inference function and decorated it with @app.post("/inference"). This endpoint takes an image uploaded by the user as input. The image is first saved and then preprocessed, in the exact same way as the raw data was preprocessed, such that it matches the input format expected by the model. After preprocessing, the image is passed through the model to generate predictions. The API then returns the class probabilities as the output, representing the model’s confidence for each class. In addition, the response includes a URL pointing to the processed image.
 
 ### Question 24
 
@@ -496,8 +497,12 @@ The API deployer without an image was deployed with the cloud run functions by S
 To invoke the service you would execute 
 
 Image API: 
-curl -X POST "https://brain-inference-api-via-functions-124059837854.europe-west1.run.app" \
- - F "file=<path to image file>” 
+curl -X POST "https://inference-api-124059837854.europe-west1.run.app/inference" \
+ - F "data=<path to image file>”
+
+curl -X GET \
+  "https://inference-api-124059837854.europe-west1.run.app/inference/image_preprocessed.png" \
+  -o image_preprocessed.png
 
 Functions API: 
 curl -X POST "https://europe-west1-mlops-g53.cloudfunctions.net/brain-inference-api-via-functions" \
@@ -507,7 +512,7 @@ curl -X POST "https://europe-west1-mlops-g53.cloudfunctions.net/brain-inference-
 
 > **Did you perform any unit testing and load testing of your API? If yes, explain how you did it and what results for**
 > **the load testing did you get. If not, explain how you would do it.**
->
+> 
 > Recommended answer length: 100-200 words.
 >
 > Example:
@@ -516,7 +521,7 @@ curl -X POST "https://europe-west1-mlops-g53.cloudfunctions.net/brain-inference-
 >
 > Answer:
 
---- question 25 fill here ---
+We did perform unit tests to test the response from the API, to check whether it responded correctly. Our inference API expects an image of any size, and will resize it to fit as input to the model. Therefore we do a random generated array and post it to the API, and checks whether it responded correctly. If we had done load testing we would have used locust and define the tasks a user could do. Then run the loadtest where each "user" repeatedly send image inference requests, sometimes querying the root and the fetching of a preprocessed image. With locust we could gradually increase the number of users and get measures like response time, througput and amount of errors. Doing the load testing would give insights of the API's performance bottlenecks and scalability. Additionaly we could have added the load test to our CI/CD pipeline.
 
 ### Question 26
 
@@ -599,7 +604,11 @@ Based on these metrics, we configured alerting policies in Google Cloud Monitori
 >
 > Answer:
 
---- question 30 fill here ---
+Throughout the project we struggled alot with the cloud both for setting up training and deployment, and is where we spent most time. 
+Especially getting the model training to work optimally was an issue. But considering the time we spent on it, we ended up making shell scripts and config files to ease the process and in the end setting up triggers connected to the project repo on Github, which automatically builds docker images for both training a model and for the API, then pushing them to the bucket and end with automatically deploying the API on Cloud Run. 
+Especially setting up how to deploy our sweep to vertex AI caused alot of issues, since it required many steps and usage of several tools at once. We had to handle service accounts and permissions, ensure that the correct container image was built and pushed to Artifact Registry, and dynamically generate a YAML configuration for each run. In addition, the script had to securely retrieve the local Weights & Biases API key and inject it into the training environment, while also mounting and downloading the dataset from Google Cloud Storage inside the container before training could start.
+
+We overcame the most challenges by first trying to follow the steps in the course homepage for most tasks. If that didn't work then we would have a conversion with e.g. Copilot, but as part of this process we also learned how to ask the right questions. 
 
 ### Question 31
 
