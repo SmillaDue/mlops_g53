@@ -556,13 +556,11 @@ Based on these metrics, we configured alerting policies in Google Cloud Monitori
 > *costing the most was ... due to ... . Working in the cloud was ...*
 >
 > Answer:
->
-> S243656 has used 14% of their credit.
->
-> Working in the cloud is very nice because you can just submit your code or let the training begin and Forget about it. This is one of the main positives of working in the cloud. Another great feature of the cloud is the storage availability which can add complications to computers with low available storage space. The cloud build service gave very usefull information for debugging when Setting up both images and models. We did however experience that working on the cloud could sometimes be more slow than running locally. 
-All in all it brings a lot of quality of life features for deployment and training of machine learning projects. 
 
---- question 27 fill here ---
+We have used approx 14% of our credits. We linked the cloud to a combined project, and it seems, that we all had the same billing.
+
+Working in the cloud is very nice because you can just submit your code or let the training begin and Forget about it. This is one of the main positives of working in the cloud. Another great feature of the cloud is the storage availability which can add complications to computers with low available storage space. The cloud build service gave very usefull information for debugging when Setting up both images and models. We did however experience that working on the cloud could sometimes be more slow than running locally. 
+All in all it brings a lot of quality of life features for deployment and training of machine learning projects. 
 
 ### Question 28
 
@@ -578,7 +576,7 @@ All in all it brings a lot of quality of life features for deployment and traini
 >
 > Answer:
 
---- question 28 fill here ---
+The only extra stuff we did, was probably a slight data analysis pre our model training.
 
 ### Question 29
 
@@ -595,7 +593,17 @@ All in all it brings a lot of quality of life features for deployment and traini
 >
 > Answer:
 
---- question 29 fill here ---
+
+When the developer pushes to a branch the CI flow begins. The version control is carried out with GitHub, and a continuous integration workflow is triggered through GitHub Actions. This runs automated checks; unit test, linting, and a cloud build is triggered, which builds a Docker image for both API and training, and publishes it to the Google Cloud Artifact Registry. 
+
+For the local development environment, we integrate Hydra for configuration management, Weights & Biases for experiment tracking, and DVC for data versioning. 
+For training, Vertex AI pulls the training image from the Artifact Registry and executes the training job in a managed cloud environment. However, due to limited resources on Vertex AI (took some time to get GPU approved on vertex AI, and GPU was really slow), the hyperparameter sweeps were carried out locally (on a new macOS with MPS (took 27 sec. for our smoketest locally, where the same test took 12 min. on Vertex AI - and when bumping up both the model and the epochs, we felt forced to do this part locally). This sweep was tracked using Weights & Biases. The resulting final model is then registered by uploading it to a dedicated Google Cloud Storage bucket but also trained once on Vertex AI for learning purposes. 
+
+In the serving phase, the model is loaded from the model registry and deployed as part of a FastAPI application hosted on Cloud Run. This allows users to submit requests and receive predictions.
+
+Finally, the monitoring flow collects logs and metrics from the deployed API using Cloud Monitoring. Input and output data distributions are analyzed through a drift detection service. Alerts are triggered via GCP Alerts, if the app breaks down or too many users are using the app. 
+
+![Architecture Image](figures/architecture.jpg)
 
 ### Question 30
 
