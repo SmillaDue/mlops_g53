@@ -556,6 +556,8 @@ Based on these metrics, we configured alerting policies in Google Cloud Monitori
 > *costing the most was ... due to ... . Working in the cloud was ...*
 >
 > Answer:
+>
+> S243656 has used 14% of their credit. 
 
 --- question 27 fill here ---
 
@@ -625,5 +627,7 @@ We overcame the most challenges by first trying to follow the steps in the cours
 > *All members contributed to code by...*
 > *We have used ChatGPT to help debug our code. Additionally, we used GitHub Copilot to help write some of our code.*
 > Answer:
+>
+> s243656: Contributed and helped with Setting ud data extraction, API Setup in the cloud, dockerfiles and data monitoring with evidently. Used ChatGPT for debugging and code skeletons as well as copilot mainly for debugging.  
 
 some text
