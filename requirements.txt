@@ -345,7 +345,7 @@ packaging==26.0
     #   matplotlib
     #   pytest
     #   wandb
-pathspec==0.12.1
+pathspec==1.0.3
     # via
     #   dvc
     #   scmrepo
